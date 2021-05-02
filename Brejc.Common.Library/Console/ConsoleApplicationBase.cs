@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Brejc.Common.Console
@@ -39,41 +38,22 @@ namespace Brejc.Common.Console
             {
                 ShowBanner();
 
-                IList<IConsoleApplicationCommand> commands = ParseArguments();
+                IList<IConsoleApplicationCommand> commands = ParseArguments ();
 
                 if (commands == null)
                 {
                     ShowHelp();
-                    Environment.Exit(1);
+                    Environment.Exit (1);
                 }
                 else
                 {
                     foreach (IConsoleApplicationCommand command in commands)
-                        command.Execute();
+                        command.Execute ();
                 }
-            }
-            catch (ArgumentException ex)
-            {
-                System.Console.Error.WriteLine();
-                System.Console.Error.WriteLine("ERROR: {0}", ex.Message);
-                ShowHelp();
-                Environment.Exit(1);
-            }
-            catch (System.Net.WebException ex)
-            {
-                System.Console.Error.WriteLine();
-                System.Console.Error.WriteLine("An error occurred while accessing the network:");
-                System.Console.Error.WriteLine("{0} ({1})", ex.Message, ex.Status);
-                if (ex.Response != null)
-                    System.Console.Error.WriteLine("URI: {0}", ex.Response.ResponseUri);
-
-                Environment.Exit(2);
             }
             catch (Exception ex)
             {
-                System.Console.Error.WriteLine();
-                System.Console.Error.WriteLine("ERROR: {0}", ex);
-                Environment.Exit(2);
+                ExceptionHandler (ex);
             }
         }
 
@@ -96,6 +76,20 @@ namespace Brejc.Common.Console
         /// </summary>
         public abstract void ShowHelp ();
 
-        private string[] args;
+        /// <summary>
+        /// Handles an exception which occurred during execution of the <see cref="Run"/> method of this console application.
+        /// </summary>
+        /// <param name="ex">Instance of the thrown exception.</param>
+        public virtual void ExceptionHandler (Exception ex)
+        {
+#if DEBUG
+            System.Console.Error.WriteLine (ex.ToString());
+#endif
+            System.Console.Error.WriteLine ();
+            System.Console.Error.WriteLine ("ERROR: {0}", ex);
+            Environment.Exit (-1);
+        }
+
+        private readonly string[] args;
     }
 }

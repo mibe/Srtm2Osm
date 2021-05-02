@@ -15,9 +15,7 @@ namespace Srtm2Osm
                 return null;
 
             List<IConsoleApplicationCommand> cmdList = new List<IConsoleApplicationCommand> ();
-            IConsoleApplicationCommand cmd = null;
-
-            cmd = new Srtm2OsmCommand ();
+            IConsoleApplicationCommand cmd = new Srtm2OsmCommand ();
 
             cmd.ParseArgs (Args, 0);
             cmdList.Add (cmd);
@@ -74,6 +72,39 @@ namespace Srtm2Osm
             Console.Out.WriteLine ("       values specify the size of the area which is covered in a single");
             Console.Out.WriteLine ("       calculation run. This prevents out-of-memory errors.");
             Console.Out.WriteLine ();
+        }
+
+        public override void ExceptionHandler (Exception ex)
+        {
+            if (ex is ArgumentException)
+            {
+#if DEBUG
+                Console.Error.WriteLine (ex.ToString());
+#endif
+                Console.Error.WriteLine ();
+                Console.Error.WriteLine ("ERROR: {0}", ex.Message);
+                ShowHelp ();
+                Environment.Exit (1);
+            }
+            else if (ex is System.Net.WebException wex)
+            {
+                Console.Error.WriteLine ();
+                Console.Error.WriteLine ("An error occurred while accessing the network:");
+                Console.Error.WriteLine ("{0} ({1})", wex.Message, wex.Status);
+                if (wex.Response != null)
+                    Console.Error.WriteLine ("URI: {0}", wex.Response.ResponseUri);
+
+                Environment.Exit (2);
+            }
+            else
+            {
+#if DEBUG
+                Console.Error.WriteLine (ex.ToString());
+#endif
+                Console.Error.WriteLine ();
+                Console.Error.WriteLine ("ERROR: {0}", ex);
+                Environment.Exit (2);
+            }
         }
     }
 }
