@@ -144,6 +144,11 @@ namespace Brejc.DemLibrary
                             throw new WebException ("Download incomplete (content length mismatch).", null, WebExceptionStatus.ReceiveFailure, response);
                         }
 
+                        // Workaround for SharpZipLib issue #195
+                        // see https://github.com/icsharpcode/SharpZipLib/issues/195
+                        if (ZipConstants.DefaultCodePage == 1)
+                            ZipConstants.DefaultCodePage = 850;
+
                         // unzip it and delete the zip file
                         FastZip zip = new FastZip();
                         zip.ExtractZip (localFilename, srtm3CachePath, null);
