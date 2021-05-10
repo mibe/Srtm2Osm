@@ -76,19 +76,23 @@ namespace Srtm2Osm
 
         public override void ExceptionHandler (Exception ex)
         {
-            if (ex is ArgumentException)
-            {
 #if DEBUG
-                Console.Error.WriteLine (ex.ToString());
+            Console.Error.WriteLine(ex.ToString());
 #endif
-                Console.Error.WriteLine ();
+
+            Console.Error.WriteLine ();
+
+            ArgumentException aex = ex as ArgumentException;
+            if (aex != null)
+            {
                 Console.Error.WriteLine ("ERROR: {0}", ex.Message);
                 ShowHelp ();
                 Environment.Exit (1);
             }
-            else if (ex is System.Net.WebException wex)
+
+            System.Net.WebException wex = ex as System.Net.WebException;
+            if (wex != null)
             {
-                Console.Error.WriteLine ();
                 Console.Error.WriteLine ("An error occurred while accessing the network:");
                 Console.Error.WriteLine ("{0} ({1})", wex.Message, wex.Status);
                 if (wex.Response != null)
@@ -96,15 +100,9 @@ namespace Srtm2Osm
 
                 Environment.Exit (2);
             }
-            else
-            {
-#if DEBUG
-                Console.Error.WriteLine (ex.ToString());
-#endif
-                Console.Error.WriteLine ();
-                Console.Error.WriteLine ("ERROR: {0}", ex);
-                Environment.Exit (2);
-            }
+
+            Console.Error.WriteLine ("ERROR: {0}", ex);
+            Environment.Exit (2);
         }
     }
 }
