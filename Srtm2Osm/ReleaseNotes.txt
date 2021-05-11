@@ -3,6 +3,11 @@ Srtm2Osm tool by Igor Brejc and others
 VERSION HISTORY
 ---------------
 
+1.14
+----
+- Fixed "ERROR: 1 is not a supported code page." on Windows 10 systems when the input and system locale is different.
+- The ArduPilot Terrain Generator server is used as default SRTM source.
+
 1.13
 ----
 - Support for encrypted HTTP communication with SRTM servers.
