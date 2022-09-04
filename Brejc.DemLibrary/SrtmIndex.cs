@@ -59,7 +59,7 @@ namespace Brejc.DemLibrary
             }
         }
 
-        private static string srtmSource = "https://terrain.ardupilot.org/data/SRTM/";
+        private static string srtmSource = "http://firmware.ardupilot.org/SRTM/";
 
         private static string fileNamePattern = "href=\"([A-Za-z0-9]*\\.hgt\\.zip)\"";
 

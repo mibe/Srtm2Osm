@@ -61,7 +61,7 @@ namespace Srtm2Osm
             Console.Out.WriteLine ("       immediately upon discovery. This prevents 'out-of-memory' errors.");
             Console.Out.WriteLine ("-corrxy <corrLng> <corrLat>: correction values to shift contours");
             Console.Out.WriteLine ("-source <url>: base URL used for download");
-            Console.Out.WriteLine ("       (default 'https://terrain.ardupilot.org/data/SRTM/')");
+            Console.Out.WriteLine ("       (default 'http://firmware.ardupilot.org/SRTM/')");
             Console.Out.WriteLine ("-maxwaynodes <count>: specifies the maximum number of nodes in a single way");
             Console.Out.WriteLine ("-firstnodeid <id>: specifies the first ID of a node (default: 2^63-1)");
             Console.Out.WriteLine ("-firstwayid <id>: specifies the first ID of a way (default: 2^63-1)");

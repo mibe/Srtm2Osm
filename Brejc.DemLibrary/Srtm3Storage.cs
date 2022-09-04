@@ -252,7 +252,7 @@ namespace Brejc.DemLibrary
 
         private string srtm3CachePath;
 
-        private static string srtmSource = "https://terrain.ardupilot.org/data/SRTM/";
+        private static string srtmSource = "http://firmware.ardupilot.org/SRTM/";
 
         private IActivityLogger activityLogger = new ConsoleActivityLogger();
     }
