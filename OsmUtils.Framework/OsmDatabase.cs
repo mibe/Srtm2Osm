@@ -168,7 +168,7 @@ namespace OsmUtils.Framework
                 exportedNode.Version = 1;
                 exportedNode.Changeset = node.ChangesetId;
 
-                // Do explicity set the Lat- / LonSpecified properties.
+                // Do explicitly set the Lat- / LonSpecified properties.
                 // Otherwise the lat / lon XML attributes would not get written, if the node has
                 // a latitude or longitude of exactly 0°.
                 exportedNode.LatSpecified = true;

@@ -316,7 +316,7 @@ namespace Srtm2Osm
                             double maxLng = Double.Parse (option.Parameters[3], invariantCulture);
 
                             if (minLat == maxLat)
-                                throw new ArgumentException ("Minimum and maximum latitude should not have the same value.");
+                                throw new ArgumentException ("Minimum and maximum latitude may not have the same value.");
 
                             if (minLng == maxLng)
                                 throw new ArgumentException ("Minimum and maximum longitude should not have the same value.");
@@ -336,10 +336,10 @@ namespace Srtm2Osm
                             }
 
                             if (minLat <= -90 || maxLat > 90)
-                                throw new ArgumentException ("Latitude is out of range.");
+                                throw new ArgumentException ("Latitude is out of range (+/- 90°).");
 
                             if (minLng <= -180 || maxLng > 180)
-                                throw new ArgumentException ("Longitude is out of range.");
+                                throw new ArgumentException ("Longitude is out of range (+/- 180°).");
 
                             this.bounds.Add (new Bounds2 (minLng, minLat, maxLng, maxLat));
                             continue;
