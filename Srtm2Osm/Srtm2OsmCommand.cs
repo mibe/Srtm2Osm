@@ -190,56 +190,6 @@ namespace Srtm2Osm
             output.End ();
 
             activityLogger.Log (ActivityLogLevel.Normal, "Done.");
-
-            // TODO: SVG file generator code
-
-            //            using (FileStream stream = File.Open ("test.svg", FileMode.Create, FileAccess.Write))
-            //            {
-            //                using (StreamWriter writer = new StreamWriter (stream))
-            //                {
-            //                    int width = 1000;
-            //                    int height = 800;
-            //                    double aspectRatio = (maxLat - minLat) / height;
-            //                    aspectRatio = Math.Max (aspectRatio, (maxLng - minLng) / width);
-
-            //                    writer.WriteLine (String.Format (System.Globalization.CultureInfo.InvariantCulture,
-            //                        @"<?xml version='1.0' encoding='utf-8' standalone='yes'?>
-            //<!DOCTYPE svg[]>
-            //<svg viewBox='{0} {1} {2} {3}' width='{2}' height='{3}' id='0'>", 0, 0, width, height));
-
-            //                    foreach (Isohypse isohypse in isoCollection.Isohypses.Values)
-            //                    {
-            //                        foreach (Polyline polyline in isohypse.Segments)
-            //                        {
-            //                            StringBuilder pathString = new StringBuilder ();
-            //                            for (int i = 0; i < polyline.VerticesCount; i++)
-            //                            {
-            //                                Point3 point = polyline.Vertices[i];
-
-            //                                if (i == 0)
-            //                                {
-            //                                    pathString.AppendFormat ("M ");
-            //                                }
-            //                                else if (i == 1)
-            //                                {
-            //                                    pathString.AppendFormat ("C ");
-            //                                }
-
-            //                                pathString.AppendFormat (System.Globalization.CultureInfo.InvariantCulture, "{0},{1} ",
-            //                                    (point.X - minLng) / aspectRatio, (maxLat - point.Y) / aspectRatio);
-
-            //                                if (i > 0)
-            //                                    pathString.AppendFormat (System.Globalization.CultureInfo.InvariantCulture, "{0},{1} ",
-            //                                        (point.X - minLng) / aspectRatio, (maxLat - point.Y) / aspectRatio);
-            //                            }
-
-            //                            writer.WriteLine (@"<path d='{0}' fill='none' stroke='black' stroke-width='0.25px'/>", pathString.ToString ());
-            //                        }
-            //                    }
-
-            //                    writer.WriteLine (@"</svg>");
-            //                }
-            //            }
         }
 
         public int ParseArgs(string[] args, int startFrom)
