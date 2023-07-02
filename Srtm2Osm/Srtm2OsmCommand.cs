@@ -57,8 +57,7 @@ namespace Srtm2Osm
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolTypeExtensions.Tls11 | SecurityProtocolTypeExtensions.Tls12 | SecurityProtocolType.Ssl3;
 
             // first make sure that the SRTM directory exists
-            if (!Directory.Exists (srtmDir))
-                Directory.CreateDirectory (srtmDir);
+	        Directory.CreateDirectory (srtmDir);
 
             string srtmIndexFilename = Path.Combine (srtmDir, "SrtmIndex.dat");
             SrtmIndex srtmIndex = null;
@@ -134,7 +133,7 @@ namespace Srtm2Osm
 
                 this.bounds = newBounds;
 
-                activityLogger.LogFormat (ActivityLogLevel.Normal, "Will process {0} seperate bounds.", bounds.Count);
+                activityLogger.LogFormat (ActivityLogLevel.Normal, "Will process {0} separate bounds.", bounds.Count);
             }
 
             foreach (Bounds2 bound in this.bounds)
@@ -176,9 +175,9 @@ namespace Srtm2Osm
                 {
                     string msg = "Not enough memory. ";
                     if (this.splitWidth == 0 && this.splitHeight == 0)
-                        msg += "Try to decrease the bounding box or use the splitbounds parameter.";
+                        msg += "Try to decrease the bounding box or use the 'splitbounds' parameter.";
                     else
-                        msg += "Try to decrease the splitbounds value.";
+                        msg += "Try to decrease the 'splitbounds' value.";
 
                     activityLogger.Log (ActivityLogLevel.Error, msg);
                     break;
@@ -319,7 +318,7 @@ namespace Srtm2Osm
                                 throw new ArgumentException ("Minimum and maximum latitude may not have the same value.");
 
                             if (minLng == maxLng)
-                                throw new ArgumentException ("Minimum and maximum longitude should not have the same value.");
+                                throw new ArgumentException ("Minimum and maximum longitude may not have the same value.");
 
                             if (minLat > maxLat)
                             {
@@ -335,11 +334,7 @@ namespace Srtm2Osm
                                 maxLng = sw;
                             }
 
-                            if (minLat <= -90 || maxLat > 90)
-                                throw new ArgumentException ("Latitude is out of range (+/- 90°).");
-
-                            if (minLng <= -180 || maxLng > 180)
-                                throw new ArgumentException ("Longitude is out of range (+/- 180°).");
+                            EnsureValidCoords (minLat, maxLat, minLng, maxLng);
 
                             this.bounds.Add (new Bounds2 (minLng, minLat, maxLng, maxLat));
                             continue;
@@ -439,7 +434,7 @@ namespace Srtm2Osm
                         elevationStep = int.Parse (option.Parameters [0], invariantCulture);
 
                         if (elevationStep <= 0)
-                            throw new ArgumentException ("Elevation step should be a positive integer value.");
+                            throw new ArgumentException ("Elevation step must be a positive integer value.");
 
                         continue;
 
@@ -507,7 +502,7 @@ namespace Srtm2Osm
 
             // Check if both first*id's are set when the user wants to increment the IDs
             if (incrementId && (firstNodeId == long.MaxValue || firstWayId == long.MaxValue))
-                throw new ArgumentException ("firstnodeid and firstwayid must be set when ID incrementation mode is active.");
+                throw new ArgumentException ("'firstnodeid' and 'firstwayid' must be set when ID incrementation mode is active.");
 
             return startFrom;
         }
@@ -580,11 +575,7 @@ namespace Srtm2Osm
             maxLng = lng + lngDelta / 2;
             maxLat = lat + latDelta / 2;
 
-            if (minLat <= -90 || maxLat > 90)
-                throw new ArgumentException ("Latitude is out of range.");
-
-            if (minLng <= -180 || maxLng > 180)
-                throw new ArgumentException ("Longitude is out of range.");
+            EnsureValidCoords (minLat, maxLat, minLng, maxLng);
 
             return new Bounds2 (minLng, minLat, maxLng, maxLat);
         }
@@ -613,11 +604,7 @@ namespace Srtm2Osm
                 throw new ArgumentException ("Bounding box was not parseable.", fex);
             }
 
-            if (minLat <= -90 || maxLat > 90)
-                throw new ArgumentException ("Latitude is out of range.");
-
-            if (minLng <= -180 || maxLng > 180)
-                throw new ArgumentException ("Longitude is out of range.");
+            EnsureValidCoords (minLat, maxLat, minLng, maxLng);
 
             return new Bounds2 (minLng, minLat, maxLng, maxLat);
         }
@@ -630,12 +617,21 @@ namespace Srtm2Osm
             if (!valid)
             {
                 string msg = String.Format (CultureInfo.InvariantCulture,
-                    "Ran out of available ID numbers. {0}crement first{1}id parameter.",
+                    "Ran out of available ID numbers. {0}crement 'first{1}id' parameter.",
                     incrementId ? "De" : "In", isNodeCounter ? "node" : "way");
                 throw new ArgumentException (msg);
             }
 
             return result;
+        }
+
+        static private void EnsureValidCoords (double minLat, double maxLat, double minLng, double maxLng)
+        { 
+            if (minLat <= -90 || maxLat > 90)
+                throw new ArgumentException("Latitude is out of range (+/- 90°).");
+
+            if (minLng <= -180 || maxLng > 180)
+               throw new ArgumentException("Longitude is out of range (+/- 180°).");
         }
 
         private List<Bounds2> bounds = new List<Bounds2>();
