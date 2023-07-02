@@ -3,6 +3,10 @@ Srtm2Osm tool by Igor Brejc and others
 VERSION HISTORY
 ---------------
 
+1.15
+----
+- The ArduPilot Firmware server is used as default SRTM source.
+
 1.14
 ----
 - Fixed "ERROR: 1 is not a supported code page." on Windows 10 systems when the input and system locale is different.
