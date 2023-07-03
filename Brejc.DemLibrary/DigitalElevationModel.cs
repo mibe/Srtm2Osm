@@ -140,7 +140,7 @@ namespace Brejc.DemLibrary
                 throw new ArgumentNullException ("dem");
 
             if (LatResolution != dem.LatResolution || LonResolution != dem.LonResolution)
-                throw new ArgumentException ("The two DEM's have incompatibile resolutions.");
+                throw new ArgumentException ("The two DEM's have incompatible resolutions.");
 
             // cell absolute position
             int cellLonAbs = dem.LonOffset * dem.LonResolution;

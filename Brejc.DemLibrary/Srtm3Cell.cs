@@ -22,6 +22,8 @@ namespace Brejc.DemLibrary
 
         public bool IsLoaded { get { return data != null; } }
 
+        public bool BogusData { get; private set; }
+
         public string CellFileName
         {
             get
@@ -88,7 +90,7 @@ namespace Brejc.DemLibrary
         {
             // SRTM3 cells are always 2884802 bytes long.
             if (file.Length != 2884802)
-                throw new ArgumentException ("Invalid file size.", "file");
+                BogusData = true;
             
             using (Stream stream = file.OpenRead())
             {

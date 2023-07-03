@@ -157,6 +157,9 @@ namespace Brejc.DemLibrary
 
                     // now load it
                     cell.LoadFromCache (srtm3CachePath);
+
+                    if (cell.BogusData)
+                        activityLogger.Log (ActivityLogLevel.Warning, "Possible bogus data in cell.");
                 }
             }
             finally
