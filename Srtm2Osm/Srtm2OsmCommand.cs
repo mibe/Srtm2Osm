@@ -596,9 +596,9 @@ namespace Srtm2Osm
         private IContourMarker contourMarker = new DefaultContourMarker();
         private bool largeAreaMode;
         private string srtmSource = "";
-        private int maxWayNodes = Int32.MaxValue;
-        private long firstNodeId = long.MaxValue;
-        private long firstWayId = long.MaxValue;
+        private int maxWayNodes = 5000;
+        private long firstNodeId = long.MaxValue - 10;
+        private long firstWayId = long.MaxValue - 10;
         private bool incrementId = false;
         private double splitWidth, splitHeight;
 
