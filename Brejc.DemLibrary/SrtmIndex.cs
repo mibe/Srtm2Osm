@@ -43,23 +43,17 @@ namespace Brejc.DemLibrary
             data[longitude + 180 + 360 * (latitude + 90)] = value;
         }
 
-        public static string SrtmSource
+        public static Uri SrtmSource
         {
             get { return srtmSource; }
             set
             {
-                if (value.Length != 0)
-                {
+                if (value != null)
                     srtmSource = value;
-                    if (!srtmSource.EndsWith("/", StringComparison.Ordinal))
-                    {
-                        srtmSource += "/";
-                    }
-                }
             }
         }
 
-        private static string srtmSource = "http://firmware.ardupilot.org/SRTM/";
+        private static Uri srtmSource = new Uri ("http://firmware.ardupilot.org/SRTM/");
 
         private static string fileNamePattern = "href=\"([A-Za-z0-9]*\\.hgt\\.zip)\"";
 
@@ -75,9 +69,9 @@ namespace Brejc.DemLibrary
                  continentalRegion++)
             {
                 string region = continentalRegion.ToString();
-                string url = srtmSource + region + "/";
+                Uri uri = new Uri(srtmSource, region + "/");
 
-                WebRequest request = WebRequest.Create(new System.Uri(url));
+                WebRequest request = WebRequest.Create(uri);
                 WebResponse response = request.GetResponse();
                 // Get the stream containing content returned by the server.
                 Stream dataStream = response.GetResponseStream();

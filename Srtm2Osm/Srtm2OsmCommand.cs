@@ -57,7 +57,7 @@ namespace Srtm2Osm
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolTypeExtensions.Tls11 | SecurityProtocolTypeExtensions.Tls12 | SecurityProtocolType.Ssl3;
 
             // first make sure that the SRTM directory exists
-	        Directory.CreateDirectory (srtmDir);
+            Directory.CreateDirectory (srtmDir);
 
             string srtmIndexFilename = Path.Combine (srtmDir, "SrtmIndex.dat");
             SrtmIndex srtmIndex = null;
@@ -237,7 +237,13 @@ namespace Srtm2Osm
 
                             try
                             {
-                                uri = new Uri (option.Parameters[0]);
+                                string url = option.Parameters[0];
+
+                                // The URI has to end with a slash
+                                if (!url.EndsWith("/", StringComparison.Ordinal))
+                                    url += "/";
+
+                                uri = new Uri (url);
                             }
                             catch (UriFormatException)
                             {
@@ -252,7 +258,7 @@ namespace Srtm2Osm
                                 throw new ArgumentException (error);
                             }
 
-                            srtmSource = uri.AbsoluteUri;
+                            srtmSource = uri;
 
                             continue;
                         }
@@ -595,7 +601,7 @@ namespace Srtm2Osm
         private double majorFactor, mediumFactor;
         private IContourMarker contourMarker = new DefaultContourMarker();
         private bool largeAreaMode;
-        private string srtmSource = "";
+        private Uri srtmSource;
         private int maxWayNodes = 5000;
         private long firstNodeId = long.MaxValue - 10;
         private long firstWayId = long.MaxValue - 10;

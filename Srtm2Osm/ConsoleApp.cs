@@ -63,8 +63,8 @@ namespace Srtm2Osm
             Console.Out.WriteLine ("-source <url>: base URL used for download");
             Console.Out.WriteLine ("       (default 'http://firmware.ardupilot.org/SRTM/')");
             Console.Out.WriteLine ("-maxwaynodes <count>: specifies the maximum number of nodes in a single way");
-            Console.Out.WriteLine ("-firstnodeid <id>: specifies the first ID of a node (default: 2^63-1)");
-            Console.Out.WriteLine ("-firstwayid <id>: specifies the first ID of a way (default: 2^63-1)");
+            Console.Out.WriteLine ("-firstnodeid <id>: specifies the first ID of a node (default: 2^63-11)");
+            Console.Out.WriteLine ("-firstwayid <id>: specifies the first ID of a way (default: 2^63-11)");
             Console.Out.WriteLine ("-incrementid: runs in 'ID incrementation mode' in which the OSM element ID is");
             Console.Out.WriteLine ("       incremented instead of decremented. Needs the firstnodeid and firstwayid");
             Console.Out.WriteLine ("       parameters set.");

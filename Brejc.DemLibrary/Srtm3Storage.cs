@@ -35,19 +35,13 @@ namespace Brejc.DemLibrary
             set { srtm3CachePath = value; }
         }
 
-        public static string SrtmSource
+        public static Uri SrtmSource
         {
             get { return srtmSource; }
-            set
+            set 
             {
-                if (value.Length != 0)
-                {
+                if (value != null)
                     srtmSource = value;
-                    if (!srtmSource.EndsWith("/", StringComparison.Ordinal))
-                    {
-                        srtmSource += "/";
-                    }
-                }
             }
         }
 
@@ -75,8 +69,7 @@ namespace Brejc.DemLibrary
         public IDigitalElevationModel LoadDemForArea (Bounds2 bounds)
         {
             // make sure the cache directory exists
-            if (false == Directory.Exists (srtm3CachePath))
-                Directory.CreateDirectory (srtm3CachePath);
+            Directory.CreateDirectory (srtm3CachePath);
 
             // first create a list of geographicals cells which constitute the specified area
             IDictionary<int, Srtm3Cell> cellsToUse = new Dictionary<int, Srtm3Cell> ();
@@ -112,13 +105,13 @@ namespace Brejc.DemLibrary
                         }
 
                         string filename = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}.zip", cell.CellFileName);
-                        string url = srtmSource + continentalRegion.ToString() + "/" + filename;
+                        Uri uri = new Uri(srtmSource, continentalRegion.ToString() + "/" + filename);
 
                         string localFilename = Path.Combine (srtm3CachePath, filename);
 
                         this.activityLogger.Log(ActivityLogLevel.Verbose, "Downloading SRTM cell " + cell.CellFileName);
 
-                        WebRequest request = WebRequest.Create(new System.Uri(url));
+                        WebRequest request = WebRequest.Create(uri);
                         WebResponse response = request.GetResponse();
                         // Get the stream containing content returned by the server.
                         Stream dataStream = response.GetResponseStream();
@@ -255,8 +248,8 @@ namespace Brejc.DemLibrary
 
         private string srtm3CachePath;
 
-        private static string srtmSource = "http://firmware.ardupilot.org/SRTM/";
+        private static Uri srtmSource = new Uri ("http://firmware.ardupilot.org/SRTM/");
 
-        private IActivityLogger activityLogger = new ConsoleActivityLogger();
+        private IActivityLogger activityLogger = new ConsoleActivityLogger ();
     }
 }
