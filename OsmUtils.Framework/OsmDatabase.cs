@@ -142,6 +142,8 @@ namespace OsmUtils.Framework
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
         public osm ExportData (string generator)
         {
+            string dateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ssK";
+
             osm osmData = new osm ();
             osmData.Version = "0.6";
             osmData.Upload = false;
@@ -160,7 +162,7 @@ namespace OsmUtils.Framework
                 exportedNode.Id = node.ObjectId;
                 exportedNode.Lat = node.Latitude;
                 exportedNode.Lon = node.Longitude;
-                exportedNode.Timestamp = node.Timestamp.ToString ("o", CultureInfo.InvariantCulture);
+                exportedNode.Timestamp = node.Timestamp.ToString (dateTimeFormat, CultureInfo.InvariantCulture);
                 exportedNode.User = node.User.Name;
                 exportedNode.Uid = node.User.Id;
                 exportedNode.Visible = node.Visible;
@@ -185,7 +187,7 @@ namespace OsmUtils.Framework
             {
                 osmWay exportedWay = new osmWay ();
                 exportedWay.Id = way.ObjectId;
-                exportedWay.Timestamp = way.Timestamp.ToString ("o" , CultureInfo.InvariantCulture);
+                exportedWay.Timestamp = way.Timestamp.ToString (dateTimeFormat, CultureInfo.InvariantCulture);
                 exportedWay.User = way.User.Name;
                 exportedWay.Uid = way.User.Id;
                 exportedWay.Visible = way.Visible;
@@ -212,7 +214,7 @@ namespace OsmUtils.Framework
             {
                 osmRelation exportedRelation = new osmRelation ();
                 exportedRelation.Id = relation.ObjectId;
-                exportedRelation.Timestamp = relation.Timestamp.ToString ("o", CultureInfo.InvariantCulture);
+                exportedRelation.Timestamp = relation.Timestamp.ToString (dateTimeFormat, CultureInfo.InvariantCulture);
                 exportedRelation.User = relation.User.Name;
                 exportedRelation.Uid = relation.User.Id;
                 exportedRelation.Visible = relation.Visible;

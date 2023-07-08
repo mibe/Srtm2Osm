@@ -48,6 +48,8 @@ namespace Srtm2Osm
             if (isohypse == null)
                 throw new ArgumentNullException("isohypse");
 
+            string timestamp = DateTime.UtcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ssK");
+
             foreach (Polyline polyline in isohypse.Segments)
             {
                 OsmUtils.OsmSchema.osmWay way = new osmWay ();
@@ -56,7 +58,7 @@ namespace Srtm2Osm
 
                 way.Id = wayCallback ();
                 way.Nd = new List<osmWayND> ();
-                way.Timestamp = DateTime.UtcNow.ToString ("o", System.Globalization.CultureInfo.InvariantCulture);
+                way.Timestamp = timestamp;
                 way.Version = 1;
                 way.User = settings.UserName;
                 way.Uid = settings.UserId;
@@ -72,7 +74,7 @@ namespace Srtm2Osm
                     node.Id = nodeCallback ();
                     node.Lat = point.Y + settings.LatitudeCorrection;
                     node.Lon = point.X + settings.LongitudeCorrection;
-                    node.Timestamp = DateTime.UtcNow.ToString ("o", System.Globalization.CultureInfo.InvariantCulture);
+                    node.Timestamp = timestamp;
                     node.Version = 1;
                     node.User = settings.UserName;
                     node.Uid = settings.UserId;
@@ -104,7 +106,7 @@ namespace Srtm2Osm
                         way = new osmWay ();
                         way.Id = wayCallback ();
                         way.Nd = new List<osmWayND> ();
-                        way.Timestamp = DateTime.UtcNow.ToString ("o", System.Globalization.CultureInfo.InvariantCulture);
+                        way.Timestamp = timestamp;
                         way.Version = 1;
                         way.User = settings.UserName;
                         way.Uid = settings.UserId;

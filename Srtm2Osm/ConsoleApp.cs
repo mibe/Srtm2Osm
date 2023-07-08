@@ -78,6 +78,7 @@ namespace Srtm2Osm
         {
 #if DEBUG
             Console.Error.WriteLine(ex.ToString());
+            Console.ReadLine();
 #endif
 
             Console.Error.WriteLine ();
