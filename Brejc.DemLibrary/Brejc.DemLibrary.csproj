@@ -81,7 +81,6 @@
     <Compile Include="ElevationAnalyzer.cs" />
     <Compile Include="ElevationDataProcessor.cs" />
     <Compile Include="FileBasedRasterDigitalElevationModel.cs" />
-    <Compile Include="FtpClient.cs" />
     <Compile Include="GeoPosition.cs" />
     <Compile Include="IActivityLogger.cs" />
     <Compile Include="IDemLoader.cs" />
