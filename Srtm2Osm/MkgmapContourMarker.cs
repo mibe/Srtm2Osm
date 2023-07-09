@@ -40,11 +40,11 @@ namespace Srtm2Osm
         public void MarkContour (OsmWay isohypseWay, Isohypse isohypse)
         {
             if (isohypseWay == null)
-                throw new ArgumentNullException ("isohypseWay");                
+                throw new ArgumentNullException ("isohypseWay");
 
             if (isohypse == null)
-                throw new ArgumentNullException ("isohypse");                
-            
+                throw new ArgumentNullException ("isohypse");
+
             firstMarker.MarkContour (isohypseWay, isohypse);
 
             double elevation = Math.Round (isohypse.Elevation / elevationUnits);

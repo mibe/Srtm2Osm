@@ -37,18 +37,19 @@ namespace Brejc.DemLibrary
             }
         }
 
+        private static Regex regex = new Regex("^(?'latSign'[N|S])(?'latitude'[0-9]{2})(?'longSign'[W|E])(?'longitude'[0-9]{3})",
+            RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+
         public Srtm3Cell (Int16 longitude, Int16 latitude)
             : base (1200, 1200, longitude, latitude, 1201, 1201)
         {
         }
 
-        static public Srtm3Cell CreateSrtm3Cell (string fileName, bool load)
+        public static Srtm3Cell CreateSrtm3Cell (string fileName, bool load)
         {
-            Regex regex = new Regex ("^(?'latSign'[N|S])(?'latitude'[0-9]{2})(?'longSign'[W|E])(?'longitude'[0-9]{3})",
-                RegexOptions.ExplicitCapture | RegexOptions.IgnoreCase);
-
             Match match = regex.Match (fileName);
-            if (false == match.Success)
+            if (!match.Success)
                 throw new ArgumentException ("Invalid filename", "fileName");
 
             char latSign = match.Groups["latSign"].Value[0];
@@ -70,14 +71,14 @@ namespace Brejc.DemLibrary
 
         [SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "lat+90")]
         [SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "lng+180")]
-        static public int CalculateCellKey (int lng, int lat)
+        public static int CalculateCellKey (int lng, int lat)
         {
             int key = ((lng + 180) << 16) | (lat + 90);
             return key;
         }
 
         [SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "lng+180")]
-        static public int CalculateCellKey (Srtm3Cell cell)
+        public static int CalculateCellKey (Srtm3Cell cell)
         {
             if (cell == null)
                 throw new ArgumentNullException ("cell");

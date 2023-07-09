@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Brejc.DemLibrary
 {
+    [System.Diagnostics.DebuggerStepThrough()]
     public class ConsoleActivityLogger : IActivityLogger
     {
         public ActivityLogLevel LogLevel
