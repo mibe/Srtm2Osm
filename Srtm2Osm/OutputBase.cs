@@ -32,6 +32,8 @@ namespace Srtm2Osm
 
         abstract public void Merge (string mergeFile);
 
+        abstract public bool HasData { get; }
+
         protected readonly FileInfo file;
         protected readonly OutputSettings settings;
     }

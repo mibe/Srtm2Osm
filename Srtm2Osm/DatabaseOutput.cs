@@ -86,14 +86,19 @@ namespace Srtm2Osm
 
         public override void End ()
         {
-            OsmUtils.OsmSchema.osm osmData = osmDb.ExportData ("Srtm2Osm");
-            OsmUtils.OsmClient.OsmClient06.SaveFile (osmData, this.file.FullName);
+            osm osmData = osmDb.ExportData ("Srtm2Osm");
+            OsmClient06.SaveFile (osmData, this.file.FullName);
         }
 
         public override void Merge (string mergeFile)
         {
             osm osmExistingFile = OsmClient06.LoadFile (mergeFile);
             osmDb.ImportData (osmExistingFile);
+        }
+
+        public override bool HasData
+        {
+	        get { return osmDb.Nodes.Count > 0; }
         }
 
         private readonly OsmDatabase osmDb;

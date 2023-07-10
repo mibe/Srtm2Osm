@@ -123,6 +123,8 @@ namespace Srtm2Osm
 
                 waySerializer.Serialize (writer, way, ns);
             }
+
+            dataWritten = true;
         }
 
         public override void End ()
@@ -161,9 +163,11 @@ namespace Srtm2Osm
                         writer.WriteAttributes(reader, true);
                         if (reader.IsEmptyElement)
                             writer.WriteEndElement();
+                        dataWritten = true;
                         break;
                     case XmlNodeType.EndElement:
                         writer.WriteFullEndElement();
+                        dataWritten = true;
                         break;
                 }
             }
@@ -171,10 +175,19 @@ namespace Srtm2Osm
             reader.Close();
         }
 
+        public override bool HasData
+        {
+            get
+            {
+                return dataWritten;
+            }
+        }
+
         private readonly FileStream stream;
         private readonly XmlSerializer nodeSerializer;
         private readonly XmlSerializer waySerializer;
         private readonly XmlSerializerNamespaces ns;
         private XmlWriter writer;
+        private bool dataWritten;
     }
 }

@@ -182,6 +182,9 @@ namespace Srtm2Osm
                     activityLogger.Log (ActivityLogLevel.Error, msg);
                     break;
                 }
+
+                if (!output.HasData)
+                    activityLogger.Log(ActivityLogLevel.Warning, "No contour line found. Try to increase the overall area.");
             }
 
             if (!largeAreaMode)
