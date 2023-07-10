@@ -252,7 +252,7 @@ namespace Srtm2Osm
 
                             // Check if the prefix is supported. Unfortunately I couldn't find a method to check which
                             // prefixes are registered without calling WebRequest.Create(), which I didn't want here.
-                            if (uri.Scheme != "http" && uri.Scheme != "https" && uri.Scheme != "ftp")
+                            if (uri.Scheme != "http" && uri.Scheme != "https" && uri.Scheme != "ftp" && uri.Scheme != "file")
                             {
                                 string error = String.Format(invariantCulture, "The source's scheme ('{0}') is not supported.", uri.Scheme);
                                 throw new ArgumentException (error);

@@ -88,13 +88,15 @@ namespace Brejc.DemLibrary
 
             try
             {
+                WebClient webClient = new WebClient ();
+
                 foreach (Srtm3Cell cell in cellsToUse.Values)
                 {
                     // if it is not cached...
-                    if (false == cachedCells.ContainsKey (Srtm3Cell.CalculateCellKey (cell)))
+                    if (!cachedCells.ContainsKey (Srtm3Cell.CalculateCellKey (cell)))
                     {
                         // find the right subdirectory
-                        SrtmContinentalRegion continentalRegion = (SrtmContinentalRegion) index.GetValueForCell (cell.CellLon, cell.CellLat);
+                        SrtmContinentalRegion continentalRegion = index.GetValueForCell (cell.CellLon, cell.CellLat);
 
                         if (continentalRegion == SrtmContinentalRegion.None)
                         {
@@ -105,37 +107,13 @@ namespace Brejc.DemLibrary
                         }
 
                         string filename = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}.zip", cell.CellFileName);
-                        Uri uri = new Uri(srtmSource, continentalRegion.ToString() + "/" + filename);
+                        Uri uri = new Uri (srtmSource, continentalRegion + "/" + filename);
 
                         string localFilename = Path.Combine (srtm3CachePath, filename);
 
-                        this.activityLogger.Log(ActivityLogLevel.Verbose, "Downloading SRTM cell " + cell.CellFileName);
+                        this.activityLogger.Log (ActivityLogLevel.Verbose, "Downloading SRTM cell " + cell.CellFileName);
 
-                        WebRequest request = WebRequest.Create(uri);
-                        WebResponse response = request.GetResponse();
-                        // Get the stream containing content returned by the server.
-                        Stream dataStream = response.GetResponseStream();
-
-                        FileStream fileStream = new FileStream(localFilename, FileMode.OpenOrCreate);
-
-                        //Download in chuncks
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = dataStream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            fileStream.Write(buffer, 0, bytesRead);
-                        }
-                        long receivedLength = fileStream.Length;                        
-                        fileStream.Close();
-                        dataStream.Close();
-                        response.Close();
-
-                        // Check if the download is complete.
-                        if (response.ContentLength != -1 && response.ContentLength > receivedLength)
-                        {
-                            File.Delete(localFilename);
-                            throw new WebException ("Download incomplete (content length mismatch).", null, WebExceptionStatus.ReceiveFailure, response);
-                        }
+                        webClient.DownloadFile (uri, localFilename);
 
                         // Workaround for SharpZipLib issue #195
                         // see https://github.com/icsharpcode/SharpZipLib/issues/195
@@ -169,7 +147,6 @@ namespace Brejc.DemLibrary
             int width = east - west + 1;
             int height = north - south + 1;
 
-            long requiredBytes = width * height * 2L;
             int loadCounter = 1;
 
             RasterDigitalElevationModelFactory factory = new RasterDigitalElevationModelFactory (1200, 1200, west, south, width, height);

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
@@ -31,16 +30,16 @@ namespace Brejc.DemLibrary
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
-        public int GetValueForCell (int longitude, int latitude)
+        public SrtmContinentalRegion GetValueForCell (int longitude, int latitude)
         {
-            return data[longitude + 180 + 360 * (latitude + 90)];
+            return (SrtmContinentalRegion)data[longitude + 180 + 360 * (latitude + 90)];
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
-        public void SetValueForCell (int longitude, int latitude, int value)
+        public void SetValueForCell (int longitude, int latitude, SrtmContinentalRegion continentalRegion)
         {
-            data[longitude + 180 + 360 * (latitude + 90)] = value;
+            data[longitude + 180 + 360 * (latitude + 90)] = (int)continentalRegion;
         }
 
         public static Uri SrtmSource
@@ -55,7 +54,9 @@ namespace Brejc.DemLibrary
 
         private static Uri srtmSource = new Uri ("http://firmware.ardupilot.org/SRTM/");
 
-        private static string fileNamePattern = "href=\"([A-Za-z0-9]*\\.hgt\\.zip)\"";
+        // Example file: "N00E006.hgt.zip"
+        private static Regex remoteFileNameRegex = new Regex("href=\"([A-Za-z0-9]*\\.hgt\\.zip)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static Regex localFileNameRegex = new Regex("([A-Za-z0-9]*\\.hgt\\.zip)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Generates an index file by listing all available SRTM cells on the FTP site.
@@ -64,38 +65,57 @@ namespace Brejc.DemLibrary
         {
             activityLogger.Log(ActivityLogLevel.Verbose, "Downloading data for SRTM index generation");
 
-            for (SrtmContinentalRegion continentalRegion = (SrtmContinentalRegion)(SrtmContinentalRegion.None + 1); 
+            bool isLocal = srtmSource.Scheme == "file";
+
+            for (SrtmContinentalRegion continentalRegion = (SrtmContinentalRegion.None + 1); 
                  continentalRegion < SrtmContinentalRegion.End;
                  continentalRegion++)
             {
                 string region = continentalRegion.ToString();
-                Uri uri = new Uri(srtmSource, region + "/");
+                Uri uri = new Uri (srtmSource, region + "/");
 
-                WebRequest request = WebRequest.Create(uri);
-                WebResponse response = request.GetResponse();
-                // Get the stream containing content returned by the server.
-                Stream dataStream = response.GetResponseStream();
-                // Open the stream using a StreamReader for easy access.
-                StreamReader reader = new StreamReader(dataStream);
-                // Read the content.
-                string responseFromServer = reader.ReadToEnd();
-                MatchCollection matches = Regex.Matches(responseFromServer, fileNamePattern, RegexOptions.IgnoreCase);
-                // Process each match.
-                foreach (Match match in matches)
-                {
-                    GroupCollection groups = match.Groups;
-                    string filename = groups[1].Value.Trim();
-                    if (filename.Length == 0)
-                        continue;
-
-                    Srtm3Cell srtm3Cell = Srtm3Cell.CreateSrtm3Cell(filename, false);
-                    SetValueForCell(srtm3Cell.CellLon, srtm3Cell.CellLat, (int)continentalRegion);
-                }
-                // Cleanup the streams and the response.
-                reader.Close();
-                dataStream.Close();
-                response.Close();
+                if (isLocal)
+                    GenerateFromLocal (uri, continentalRegion);
+                else
+                    GenerateFromRemote (uri, continentalRegion);
             }
+        }
+
+        private void GenerateFromLocal (Uri uri, SrtmContinentalRegion continentalRegion)
+        {
+            string[] files = Directory.GetFiles (uri.AbsolutePath, "*.zip");
+            foreach (string file in files)
+            {
+                Match match = localFileNameRegex.Match (file);
+                if (!match.Success)
+                    continue;
+                
+                CreateCell(Path.GetFileName (file), continentalRegion);
+            }
+        }
+
+        private void GenerateFromRemote (Uri uri, SrtmContinentalRegion continentalRegion)
+        {
+            // Get the directory listing from the server
+            WebClient webClient = new WebClient ();
+            string responseFromServer = webClient.DownloadString (uri);
+
+            // Find files and process each match.
+            MatchCollection matches = remoteFileNameRegex.Matches (responseFromServer);
+            foreach (Match match in matches)
+            {
+                string filename = match.Groups[1].Value.Trim();
+                if (filename.Length == 0)
+                    continue;
+
+                CreateCell (filename, continentalRegion);
+            }
+        }
+
+        private void CreateCell(string filename, SrtmContinentalRegion continentalRegion)
+        {
+            Srtm3Cell srtm3Cell = Srtm3Cell.CreateSrtm3Cell(filename, false);
+            SetValueForCell(srtm3Cell.CellLon, srtm3Cell.CellLat, continentalRegion);
         }
 
         /// <summary>
