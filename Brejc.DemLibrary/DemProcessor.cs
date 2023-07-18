@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Diagnostics.CodeAnalysis;
-using log4net;
 using Brejc.DemLibrary.Shading;
 
 namespace Brejc.DemLibrary
@@ -83,8 +82,5 @@ namespace Brejc.DemLibrary
         }
 
         private DemProcessor () { }
-
-        [SuppressMessage ("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        static readonly private ILog log = LogManager.GetLogger (typeof (DemProcessor));
     }
 }

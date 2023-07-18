@@ -93,11 +93,5 @@
             </fileset>
         </copy>
 
-        <copy todir="${BuildDir}\Srtm2Osm" overwrite="true">
-            <fileset basedir="lib\log4net-1.2.10">
-                <include name="log4net.LICENSE.txt"/>
-            </fileset>
-        </copy>
-
     </target>
 </project>

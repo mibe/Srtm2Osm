@@ -56,10 +56,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\log4net-1.2.10\bin\net\2.0\release\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -72,9 +68,6 @@
     <Compile Include="Console\ConsoleApplicationOption.cs" />
     <Compile Include="Console\IConsoleApplicationCommand.cs" />
     <Compile Include="Console\SupportedOptions.cs" />
-    <Compile Include="Logging\ILogPublisher.cs" />
-    <Compile Include="Logging\LogMessageEventArgs.cs" />
-    <Compile Include="Logging\ObserverAppender.cs" />
     <Compile Include="ObjectHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xml\XmlFluentAttribute.cs" />

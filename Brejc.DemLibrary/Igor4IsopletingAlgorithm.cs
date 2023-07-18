@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using log4net;
 //using Brejc.Visualization;
 using System.Diagnostics.CodeAnalysis;
 using Brejc.Geometry;
@@ -546,8 +545,5 @@ namespace Brejc.DemLibrary
 
         private IActivityLogger activityLogger = new ConsoleActivityLogger ();
         //private IVisualizer visualizer;
-
-        [SuppressMessage ("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-        static private readonly ILog log = LogManager.GetLogger (typeof (Igor4IsopletingAlgorithm));
     }
 }
