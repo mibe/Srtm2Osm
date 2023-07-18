@@ -90,15 +90,6 @@
      </Message>
     </Messages>
    </Namespace>
-   <Namespace Name="Brejc.Common.Logging">
-    <Messages>
-     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Status="Excluded" Created="2008-06-05 16:36:50Z">
-      <Issue>
-       <Item>Brejc.Common.Logging</Item>
-      </Issue>
-     </Message>
-    </Messages>
-   </Namespace>
    <Namespace Name="Brejc.Common.Xml">
     <Messages>
      <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Status="Excluded" Created="2008-06-05 16:36:50Z">
@@ -157,20 +148,6 @@
             </Messages>
            </Member>
           </Members>
-         </Type>
-        </Types>
-       </Namespace>
-       <Namespace Name="Brejc.Common.Logging">
-        <Types>
-         <Type Name="ObserverAppender">
-          <Messages>
-           <Message Id="Appender" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Excluded" Created="2008-06-05 16:36:50Z">
-            <Issue Name="Type">
-             <Item>Appender</Item>
-             <Item>'ObserverAppender'</Item>
-            </Issue>
-           </Message>
-          </Messages>
          </Type>
         </Types>
        </Namespace>
@@ -261,392 +238,6 @@
               <Issue>
                <Item>'FileBasedRasterDigitalElevationModel.~FileBasedRasterDigitalElevationModel()'</Item>
                <Item>'object'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-          </Members>
-         </Type>
-         <Type Name="FtpClient">
-          <Messages>
-           <Message TypeName="TypesThatOwnDisposableFieldsShouldBeDisposable" Category="Microsoft.Design" CheckId="CA1001" Status="Excluded" Created="2008-01-06 17:38:35Z" FixCategory="DependsOnFix">
-            <Issue Name="DependsOnFix">
-             <Item>'FtpClient'</Item>
-             <Item>'Socket'</Item>
-            </Issue>
-           </Message>
-          </Messages>
-          <Members>
-           <Member Name="#.ctor()">
-            <Messages>
-             <Message TypeName="DoNotInitializeUnnecessarily" Category="Microsoft.Performance" CheckId="CA1805" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'FtpClient.FtpClient()'</Item>
-               <Item>'FtpClient.debug'</Item>
-               <Item>'bool'</Item>
-               <Item>false</Item>
-              </Issue>
-              <Issue>
-               <Item>'FtpClient.FtpClient()'</Item>
-               <Item>'FtpClient.logined'</Item>
-               <Item>'bool'</Item>
-               <Item>false</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#chdir(System.String)">
-            <Messages>
-             <Message Id="chdir" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>chdir</Item>
-               <Item>'FtpClient.chdir(string)'</Item>
-               <Item>Chdir</Item>
-              </Issue>
-             </Message>
-             <Message Id="chdir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>chdir</Item>
-               <Item>'FtpClient.chdir(string)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#close()">
-            <Messages>
-             <Message Id="close" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>close</Item>
-               <Item>'FtpClient.close()'</Item>
-               <Item>Close</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#createDataSocket()">
-            <Messages>
-             <Message Id="System.Int32.Parse(System.String)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'int.Parse(string)'</Item>
-               <Item>'FtpClient.createDataSocket()'</Item>
-               <Item>'int.Parse(string, IFormatProvider)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#deleteRemoteFile(System.String)">
-            <Messages>
-             <Message Id="delete" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>delete</Item>
-               <Item>'FtpClient.deleteRemoteFile(string)'</Item>
-               <Item>Delete</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#download(System.String)">
-            <Messages>
-             <Message Id="download" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>download</Item>
-               <Item>'FtpClient.download(string)'</Item>
-               <Item>Download</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#download(System.String,System.Boolean)">
-            <Messages>
-             <Message Id="download" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>download</Item>
-               <Item>'FtpClient.download(string, bool)'</Item>
-               <Item>Download</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#download(System.String,System.String)">
-            <Messages>
-             <Message Id="download" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>download</Item>
-               <Item>'FtpClient.download(string, string)'</Item>
-               <Item>Download</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#download(System.String,System.String,System.Boolean)">
-            <Messages>
-             <Message Id="download" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>download</Item>
-               <Item>'FtpClient.download(string, string, bool)'</Item>
-               <Item>Download</Item>
-              </Issue>
-             </Message>
-             <Message TypeName="TestForEmptyStringsUsingStringLength" Category="Microsoft.Performance" CheckId="CA1820" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="IsNullOrEmpty">
-               <Item>'string.Equals(string)'</Item>
-               <Item>'FtpClient.download(string, string, bool)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#getFileList(System.String)">
-            <Messages>
-             <Message Id="get" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>get</Item>
-               <Item>'FtpClient.getFileList(string)'</Item>
-               <Item>Get</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#getFileSize(System.String)">
-            <Messages>
-             <Message Id="get" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>get</Item>
-               <Item>'FtpClient.getFileSize(string)'</Item>
-               <Item>Get</Item>
-              </Issue>
-             </Message>
-             <Message Id="System.Int64.Parse(System.String)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'long.Parse(string)'</Item>
-               <Item>'FtpClient.getFileSize(string)'</Item>
-               <Item>'long.Parse(string, IFormatProvider)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#getRemoteHost()">
-            <Messages>
-             <Message Id="get" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>get</Item>
-               <Item>'FtpClient.getRemoteHost()'</Item>
-               <Item>Get</Item>
-              </Issue>
-             </Message>
-             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'FtpClient.getRemoteHost()'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#getRemotePath()">
-            <Messages>
-             <Message Id="get" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>get</Item>
-               <Item>'FtpClient.getRemotePath()'</Item>
-               <Item>Get</Item>
-              </Issue>
-             </Message>
-             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'FtpClient.getRemotePath()'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#getRemotePort()">
-            <Messages>
-             <Message Id="get" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>get</Item>
-               <Item>'FtpClient.getRemotePort()'</Item>
-               <Item>Get</Item>
-              </Issue>
-             </Message>
-             <Message TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'FtpClient.getRemotePort()'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#login()">
-            <Messages>
-             <Message Id="login" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>login</Item>
-               <Item>'FtpClient.login()'</Item>
-               <Item>Login</Item>
-              </Issue>
-             </Message>
-             <Message Id="login" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>login</Item>
-               <Item>'FtpClient.login()'</Item>
-               <Item>LogOn</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#mkdir(System.String)">
-            <Messages>
-             <Message Id="mkdir" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>mkdir</Item>
-               <Item>'FtpClient.mkdir(string)'</Item>
-               <Item>Mkdir</Item>
-              </Issue>
-             </Message>
-             <Message Id="mkdir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>mkdir</Item>
-               <Item>'FtpClient.mkdir(string)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#readReply()">
-            <Messages>
-             <Message Id="System.Int32.Parse(System.String)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'int.Parse(string)'</Item>
-               <Item>'FtpClient.readReply()'</Item>
-               <Item>'int.Parse(string, IFormatProvider)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#renameRemoteFile(System.String,System.String)">
-            <Messages>
-             <Message Id="rename" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>rename</Item>
-               <Item>'FtpClient.renameRemoteFile(string, string)'</Item>
-               <Item>Rename</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#rmdir(System.String)">
-            <Messages>
-             <Message Id="rmdir" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>rmdir</Item>
-               <Item>'FtpClient.rmdir(string)'</Item>
-               <Item>Rmdir</Item>
-              </Issue>
-             </Message>
-             <Message Id="rmdir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>rmdir</Item>
-               <Item>'FtpClient.rmdir(string)'</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setBinaryMode(System.Boolean)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setBinaryMode(bool)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setDebug(System.Boolean)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setDebug(bool)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setRemoteHost(System.String)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setRemoteHost(string)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setRemotePass(System.String)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setRemotePass(string)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setRemotePath(System.String)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setRemotePath(string)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setRemotePort(System.Int32)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setRemotePort(int)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#setRemoteUser(System.String)">
-            <Messages>
-             <Message Id="set" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>set</Item>
-               <Item>'FtpClient.setRemoteUser(string)'</Item>
-               <Item>Set</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#upload(System.String)">
-            <Messages>
-             <Message Id="upload" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>upload</Item>
-               <Item>'FtpClient.upload(string)'</Item>
-               <Item>Upload</Item>
-              </Issue>
-             </Message>
-            </Messages>
-           </Member>
-           <Member Name="#upload(System.String,System.Boolean)">
-            <Messages>
-             <Message TypeName="DoNotCatchGeneralExceptionTypes" Category="Microsoft.Design" CheckId="CA1031" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue>
-               <Item>'FtpClient.upload(string, bool)'</Item>
-               <Item>'Exception'</Item>
-              </Issue>
-             </Message>
-             <Message Id="upload" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Excluded" Created="2008-01-06 17:38:35Z">
-              <Issue Name="Member">
-               <Item>upload</Item>
-               <Item>'FtpClient.upload(string, bool)'</Item>
-               <Item>Upload</Item>
               </Issue>
              </Message>
             </Messages>
@@ -1078,9 +669,6 @@
    <Rule TypeName="DoNotExposeGenericLists" Category="Microsoft.Design" CheckId="CA1002">
     <Resolution Name="Default" />
    </Rule>
-   <Rule TypeName="DoNotInitializeUnnecessarily" Category="Microsoft.Performance" CheckId="CA1805">
-    <Resolution Name="Default">{0} initializes field {1} of type {2} to {3}. Remove this initialization because it will be done automatically by the runtime.</Resolution>
-   </Rule>
    <Rule TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709">
     <Resolution Name="Member">Correct the casing of '{0}' in member name {1} by changing it to '{2}'.</Resolution>
     <Resolution Name="Type" />
@@ -1090,16 +678,12 @@
     <Resolution Name="MemberMoreMeaningfulName" />
     <Resolution Name="MemberParameter">In method {0}, correct the spelling of '{1}' in parameter name {2} or remove it entirely if it represents any sort of Hungarian notation.</Resolution>
     <Resolution Name="MemberParameterMoreMeaningfulName" />
-    <Resolution Name="Type">Correct the spelling of '{0}' in type name {1}.</Resolution>
    </Rule>
    <Rule TypeName="MembersShouldNotExposeCertainConcreteTypes" Category="Microsoft.Design" CheckId="CA1059">
     <Resolution Name="Xml">Modify member {0} so that it no longer exposes the concrete type {1}. Use IXPathNavigable to represent XML data sources.</Resolution>
    </Rule>
    <Rule TypeName="PropertyNamesShouldNotMatchGetMethods" Category="Microsoft.Naming" CheckId="CA1721">
     <Resolution Name="BaseType">The property name {0} is confusing given the existence of inherited method {1}. Rename or remove this property.</Resolution>
-   </Rule>
-   <Rule TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305">
-    <Resolution Name="Default">Because the behavior of {0} could vary based on the current user's locale settings, replace this call in {1} with a call to {2}. If the result of {2} will be displayed to the user, specify 'CultureInfo.CurrentCulture' as the 'IFormatProvider' parameter. Otherwise, if the result will be stored and accessed by software, such as when it is persisted to disk or to a database, specify 'CultureInfo.InvariantCulture'.</Resolution>
    </Rule>
    <Rule TypeName="TestForEmptyStringsUsingStringLength" Category="Microsoft.Performance" CheckId="CA1820">
     <Resolution Name="IsNullOrEmpty">Replace the call to {0} in {1} with a call to 'String.IsNullOrEmpty'.</Resolution>
@@ -1109,12 +693,6 @@
    </Rule>
    <Rule TypeName="UseOrdinalStringComparison" Category="Microsoft.Globalization" CheckId="CA1309">
     <Resolution Name="StringComparison">{0} passes {1} as an argument to {2}. Replace this usage with StringComparison.Ordinal or StringComparison.OrdinalIgnoreCase if appropriate.</Resolution>
-   </Rule>
-   <Rule TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726">
-    <Resolution Name="Member">Replace the term '{0}' in member name {1} with the preferred alternate '{2}'.</Resolution>
-   </Rule>
-   <Rule TypeName="UsePropertiesWhereAppropriate" Category="Microsoft.Design" CheckId="CA1024">
-    <Resolution Name="Default">Change {0} to a property if appropriate.</Resolution>
    </Rule>
   </Rules>
  </FxCopReport>
