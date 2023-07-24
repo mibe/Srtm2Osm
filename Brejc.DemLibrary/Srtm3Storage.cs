@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Net;
-using ICSharpCode.SharpZipLib.Zip;
 using Brejc.Geometry;
 
 namespace Brejc.DemLibrary
@@ -115,14 +114,8 @@ namespace Brejc.DemLibrary
 
                         webClient.DownloadFile (uri, localFilename);
 
-                        // Workaround for SharpZipLib issue #195
-                        // see https://github.com/icsharpcode/SharpZipLib/issues/195
-                        if (ZipConstants.DefaultCodePage == 1)
-                            ZipConstants.DefaultCodePage = 850;
-
                         // unzip it and delete the zip file
-                        FastZip zip = new FastZip();
-                        zip.ExtractZip (localFilename, srtm3CachePath, null);
+                        System.IO.Compression.ZipFile.ExtractToDirectory(localFilename, srtm3CachePath);
                         File.Delete (localFilename);
                     }
 
