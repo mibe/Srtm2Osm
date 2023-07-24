@@ -48,7 +48,7 @@ namespace Srtm2Osm
             if (isohypse == null)
                 throw new ArgumentNullException("isohypse");
 
-            string timestamp = DateTime.UtcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ssK");
+            string timestamp = DateTime.UtcNow.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ssK", System.Globalization.CultureInfo.InvariantCulture);
 
             foreach (Polyline polyline in isohypse.Segments)
             {
