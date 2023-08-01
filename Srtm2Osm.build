@@ -62,20 +62,6 @@
 		</zipfileset>
 	</target>
 
-    <!--<target name="test.unit.custom">
-        <property name="UnitTestEngine" value="MbUnit"/>
-        <property name="MbUnitBin" value=".\lib\MbUnit" />
-        <property name="NCoverVersion" value="1.5.8"/>
-        <property name="NCoverExplorerVersion" value="1.3.6.36"/>
-        <property name="StopIfTestsFail" value="true" />
-
-        <property name="AssemblyToTest" value="${project::get-base-directory()}\OsmUtils.Tests\bin\${ProjectConfig}\OsmUtils.Tests.dll" />
-        <property name="IncludeTestCategories" value="" />
-        <property name="ExcludeTestCategories" value="NoNAnt" />
-        <property name="NoCoverage" value="False"/>
-        <call target="test.run"/>
-    </target>-->
-
     <target name="copy.deliverables.custom" description="copies all necessary files to the build directory">
         <copy todir="${BuildDir}\Srtm2Osm" overwrite="true">
             <fileset basedir="Srtm2Osm\bin\${ProjectConfig}">
