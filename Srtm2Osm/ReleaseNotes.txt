@@ -3,6 +3,15 @@ Srtm2Osm tool by Igor Brejc and others
 VERSION HISTORY
 ---------------
 
+1.16
+----
+- Changed defaults for node & way IDs, because downstream software uses the old defaults for state handling.
+- Downgrade the cell file size check, which will trigger a warning instead an error.
+- Don't output fractional seconds in the resulting file. Another fix for downstream software...
+- Add support for file:// scheme in source URLs.
+- Display a warning when no contour lines were generated.
+- Srtm2Osm requires at least .NET Framework 4.6.2
+
 1.15
 ----
 - The ArduPilot Firmware server is used as default SRTM source.
