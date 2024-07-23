@@ -52,6 +52,7 @@ namespace Srtm2Osm
             Console.Out.WriteLine ("-i: forces the regeneration of SRTM index file (default: no)");
             Console.Out.WriteLine ("-feet: uses feet units for elevation instead of meters");
             Console.Out.WriteLine ("-step <elevation>: elevation step between contours (default: 20 units)");
+            Console.Out.WriteLine ("-first <elevation>: do not create contour lines below this level");
             Console.Out.WriteLine ("-cat <major> <medium>: adds contour category tag to OSM ways");
             Console.Out.WriteLine ("       example: -cat 400 100 will mark:");
             Console.Out.WriteLine ("           contours 400, 800, 1200 etc as contour_ext=elevation_major");

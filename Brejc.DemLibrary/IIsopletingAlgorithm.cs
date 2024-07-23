@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-//using Brejc.Visualization;
-
 namespace Brejc.DemLibrary
 {
     public delegate void NewIsohypseCallback (Isohypse isohypse);
@@ -25,9 +20,10 @@ namespace Brejc.DemLibrary
         /// </summary>
         /// <param name="dem">The digital elevation model.</param>
         /// <param name="elevationStep">The step (in meters) to use when calculating isohypses.</param>
+        /// <param name="setMinElevation">The first elevation (in meters) to use when calculating isohypses (if not null).</param>
         /// <returns>A collection of isohypses stored in the <see cref="IsohypseCollection"/> object.</returns>
-        IsohypseCollection Isoplete (IRasterDigitalElevationModel dem, double elevationStep);
+        IsohypseCollection Isoplete (IRasterDigitalElevationModel dem, double elevationStep, double? setMinElevation);
 
-        void Isoplete (IRasterDigitalElevationModel dem, double elevationStep, NewIsohypseCallback callback);
+        void Isoplete (IRasterDigitalElevationModel dem, double elevationStep, double? setMinElevation, NewIsohypseCallback callback);
     }
 }

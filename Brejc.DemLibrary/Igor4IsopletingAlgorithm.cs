@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 //using Brejc.Visualization;
 using System.Diagnostics.CodeAnalysis;
 using Brejc.Geometry;
@@ -29,11 +28,19 @@ namespace Brejc.DemLibrary
         //}
 
         [SuppressMessage ("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Body")]
-        public void Isoplete (IRasterDigitalElevationModel dem, double elevationStep, NewIsohypseCallback callback)
+        public void Isoplete (IRasterDigitalElevationModel dem, double elevationStep, double? setMinElevation, NewIsohypseCallback callback)
         {
             DigitalElevationModelStatistics statistics = dem.CalculateStatistics ();
 
-            double minElevation = Math.Floor (statistics.MinElevation / elevationStep) * elevationStep;
+            double minElevation;
+            if (setMinElevation.HasValue)
+            {
+                minElevation = setMinElevation.Value;
+            }
+            else
+            {
+                minElevation = Math.Floor(statistics.MinElevation / elevationStep) * elevationStep;
+            }
             double maxElevation = Math.Floor (statistics.MaxElevation / elevationStep) * elevationStep;
 
             //if (visualizer != null)
@@ -208,11 +215,11 @@ namespace Brejc.DemLibrary
             }
         }
 
-        public IsohypseCollection Isoplete (IRasterDigitalElevationModel dem, double elevationStep)
+        public IsohypseCollection Isoplete (IRasterDigitalElevationModel dem, double elevationStep, double? setMinElevation)
         {
             IsohypseCollection isoColl = new IsohypseCollection ();
 
-            Isoplete (dem, elevationStep, delegate (Isohypse isohypse)
+            Isoplete (dem, elevationStep, setMinElevation, delegate (Isohypse isohypse)
             {
                 isoColl.AddIsohypse (isohypse);
             });
