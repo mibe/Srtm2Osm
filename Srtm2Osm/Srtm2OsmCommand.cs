@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Brejc.Common.Console;
 using Brejc.DemLibrary;
-using OsmUtils.Framework;
-using OsmUtils.OsmSchema;
 using System.IO;
-using OsmUtils.OsmClient;
 using System.Xml;
 using System.Web;
 using System.Collections.Specialized;
-using System.Xml.Serialization;
 using Brejc.Geometry;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -33,6 +28,7 @@ namespace Srtm2Osm
         LargeAreaMode,
         CorrectionXY,
         SrtmSource,
+        SetMinElevation,
         MaxWayNodes,
         FirstNodeId,
         FirstWayId,
@@ -165,7 +161,7 @@ namespace Srtm2Osm
 
                 try
                 {
-                    alg.Isoplete (dem, elevationStepInUnits, delegate(Isohypse isohypse)
+                    alg.Isoplete (dem, elevationStepInUnits, setMinElevation, delegate(Isohypse isohypse)
                     {
                         output.ProcessIsohypse (isohypse, delegate() { return GetNextId (nodeCounter, true); },
                             delegate() { return GetNextId (wayCounter, false); });
@@ -214,6 +210,7 @@ namespace Srtm2Osm
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.LargeAreaMode, "large", 0));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.CorrectionXY, "corrxy", 2));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSource, "source", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SetMinElevation, "first", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.MaxWayNodes, "maxwaynodes", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstNodeId, "firstnodeid", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstWayId, "firstwayid", 1));
@@ -395,6 +392,10 @@ namespace Srtm2Osm
                         if (elevationStep <= 0)
                             throw new ArgumentException ("Elevation step must be a positive integer value.");
 
+                        continue;
+
+                    case Srtm2OsmCommandOption.SetMinElevation:
+                        setMinElevation = double.Parse(option.Parameters[0], CultureInfo.InvariantCulture);
                         continue;
 
                     case Srtm2OsmCommandOption.Categories:
@@ -605,6 +606,7 @@ namespace Srtm2Osm
         private IContourMarker contourMarker = new DefaultContourMarker();
         private bool largeAreaMode;
         private Uri srtmSource;
+        private double ? setMinElevation = null;
         private int maxWayNodes = 5000;
         private long firstNodeId = long.MaxValue - 10;
         private long firstWayId = long.MaxValue - 10;
