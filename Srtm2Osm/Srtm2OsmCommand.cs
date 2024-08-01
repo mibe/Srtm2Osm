@@ -64,6 +64,7 @@ namespace Srtm2Osm
             activityLogger.LogFormat(ActivityLogLevel.Verbose, "Set Source in index to {0}", srtmSource);
             SrtmIndex.SrtmSource = srtmSource;
             SrtmIndex.SrtmSourceFlat = srtmSourceFlat;
+            SrtmIndex.SrtmSourceExtension = srtmSourceExtension;
             var forceIndexGeneration = false;
 
             try
@@ -269,11 +270,11 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.OutputFile:
-                        outputOsmFile = option.Parameters[0];
+                        outputOsmFile = option.Parameters [0];
                         continue;
 
                     case Srtm2OsmCommandOption.MergeFile:
-                        osmMergeFile = option.Parameters[0];
+                        osmMergeFile = option.Parameters [0];
                         continue;
 
                     case Srtm2OsmCommandOption.SrtmCachePath:
@@ -288,7 +289,7 @@ namespace Srtm2Osm
                         elevationStep = int.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
 
                         if (elevationStep <= 0)
-                            throw new ArgumentException("Elevation step must be a positive integer value.");
+                            throw new ArgumentException ("Elevation step must be a positive integer value.");
 
                         continue;
 
@@ -296,7 +297,7 @@ namespace Srtm2Osm
                         majorFactor = double.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
                         mediumFactor = double.Parse (option.Parameters[1], CultureInfo.InvariantCulture);
 
-                        contourMarker = new MkgmapContourMarker(majorFactor, mediumFactor);
+                        contourMarker = new MkgmapContourMarker (majorFactor, mediumFactor);
                         continue;
 
                     case Srtm2OsmCommandOption.Feet:
@@ -340,7 +341,7 @@ namespace Srtm2Osm
                         splitWidth = double.Parse(option.Parameters[1], CultureInfo.InvariantCulture);
 
                         if (splitWidth <= 0 || splitHeight <= 0)
-                            throw new ArgumentException("The split width or height may not be smaller than zero.");
+                            throw new ArgumentException ("The split width or height may not be smaller than zero.");
 
                         continue;
                 }
