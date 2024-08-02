@@ -222,11 +222,10 @@ namespace Srtm2Osm
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.Feet, "feet", 0));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.LargeAreaMode, "large", 0));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.CorrectionXY, "corrxy", 2));
-            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSource, "source", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SetMinElevation, "first", 1));
-            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceFlat, "flatsource", 1));
-            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceExtension, "sourceextension", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSource, "source", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceFlat, "sourceflat", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceExtension, "sourceextension", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.MaxWayNodes, "maxwaynodes", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstNodeId, "firstnodeid", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstWayId, "firstwayid", 1));
