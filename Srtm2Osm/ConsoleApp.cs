@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Brejc.Common.Console;
 
 namespace Srtm2Osm
 {
-    public class ConsoleApp : Brejc.Common.Console.ConsoleApplicationBase
+    public class ConsoleApp : ConsoleApplicationBase
     {
         public ConsoleApp (string[] args) : base (args) {}
 
@@ -63,6 +62,8 @@ namespace Srtm2Osm
             Console.Out.WriteLine ("-corrxy <corrLng> <corrLat>: correction values to shift contours");
             Console.Out.WriteLine ("-source <url>: base URL used for download");
             Console.Out.WriteLine ("       (default 'http://firmware.ardupilot.org/SRTM/')");
+            Console.Out.WriteLine ("-sourceflat <url>: URL used for download without region structure");
+            Console.Out.WriteLine ("-sourceextension <ext>: extension of the source files (default: .hgt.zip)");
             Console.Out.WriteLine ("-maxwaynodes <count>: specifies the maximum number of nodes in a single way");
             Console.Out.WriteLine ("-firstnodeid <id>: specifies the first ID of a node (default: 2^63-11)");
             Console.Out.WriteLine ("-firstwayid <id>: specifies the first ID of a way (default: 2^63-11)");

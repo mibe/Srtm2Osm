@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: AssemblyConfigurationAttribute("release")]
 [assembly: AssemblyCompanyAttribute("Igor Brejc and others")]
 [assembly: AssemblyProductAttribute("Srtm2Osm")]
-[assembly: AssemblyCopyrightAttribute("Copyright (C) 2007-2023 Igor Brejc and others")]
+[assembly: AssemblyCopyrightAttribute("Copyright (C) 2007-2024 Igor Brejc and others")]
 [assembly: AssemblyTrademarkAttribute("")]
 [assembly: AssemblyCultureAttribute("")]
 [assembly: AssemblyFileVersionAttribute("1.16.5.0")]

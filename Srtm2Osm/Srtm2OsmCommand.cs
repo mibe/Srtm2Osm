@@ -5,7 +5,6 @@ using Brejc.DemLibrary;
 using System.IO;
 using System.Xml;
 using System.Web;
-using System.Collections.Specialized;
 using Brejc.Geometry;
 using System.Text.RegularExpressions;
 using System.Globalization;
@@ -28,6 +27,8 @@ namespace Srtm2Osm
         LargeAreaMode,
         CorrectionXY,
         SrtmSource,
+        SrtmSourceFlat,
+        SrtmSourceExtension,
         SetMinElevation,
         MaxWayNodes,
         FirstNodeId,
@@ -43,8 +44,10 @@ namespace Srtm2Osm
         [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void Execute ()
         {
-            ConsoleActivityLogger activityLogger = new ConsoleActivityLogger();
-            activityLogger.LogLevel = ActivityLogLevel.Verbose;
+            ConsoleActivityLogger activityLogger = new ConsoleActivityLogger
+            {
+                LogLevel = ActivityLogLevel.Verbose
+            };
 
             // Use all available encryption protocols supported in the .NET Framework 4.0.
             // TLS versions > 1.0 are supported and available via the extensions.
@@ -56,45 +59,55 @@ namespace Srtm2Osm
             Directory.CreateDirectory (srtmDir);
 
             string srtmIndexFilename = Path.Combine (srtmDir, "SrtmIndex.dat");
-            SrtmIndex srtmIndex = null;
+            SrtmIndex srtmIndex = new SrtmIndex();
+            srtmIndex.ActivityLogger = activityLogger;
+            activityLogger.LogFormat(ActivityLogLevel.Verbose, "Set Source in index to {0}", srtmSource);
             SrtmIndex.SrtmSource = srtmSource;
+            SrtmIndex.SrtmSourceFlat = srtmSourceFlat;
+            SrtmIndex.SrtmSourceExtension = srtmSourceExtension;
+            var forceIndexGeneration = false;
 
             try
             {
-                srtmIndex = SrtmIndex.Load (srtmIndexFilename);
+                if (!srtmIndex.Load (srtmIndexFilename))
+                {
+                    forceIndexGeneration = true;
+                }
             }
             catch (Exception)
             {
                 // in case of exception, regenerate the index
-                generateIndex = true;
+                forceIndexGeneration = true;
             }
 
-            if (generateIndex)
+            if (generateIndex | forceIndexGeneration)
             {
-                srtmIndex = new SrtmIndex ();
-                srtmIndex.ActivityLogger = activityLogger;
                 srtmIndex.Generate ();
                 srtmIndex.Save (srtmIndexFilename);
-
-                srtmIndex = SrtmIndex.Load (srtmIndexFilename);
             }
 
-            Srtm3Storage.SrtmSource = srtmSource;
-            Srtm3Storage storage = new Srtm3Storage(Path.Combine(srtmDir, "SrtmCache"), srtmIndex);
-            storage.ActivityLogger = activityLogger;
+            var srtmCacheFolder = Path.Combine(srtmDir, "SrtmCache");
+            IDemLoader storage = new Srtm3Storage(srtmCacheFolder, srtmIndex)
+            {
+                ActivityLogger = activityLogger,
+                Source = srtmSource,
+                SourceExtension = srtmSourceExtension
+            };
 
-            IIsopletingAlgorithm alg = new Igor4IsopletingAlgorithm ();
-            alg.ActivityLogger = activityLogger;
+            IIsopletingAlgorithm alg = new Igor4IsopletingAlgorithm
+            {
+                ActivityLogger = activityLogger
+            };
 
             double elevationStepInUnits = elevationStep * elevationUnits;
             contourMarker.Configure (elevationUnits);
 
             // Default: Start with highest possible ID and count down. That should give maximum space
             // between contour data and real OSM data.
-            IdCounter nodeCounter = new IdCounter (incrementId, firstNodeId);
-            IdCounter wayCounter = new IdCounter (incrementId, firstWayId);
+            var nodeCounter = new IdCounter (incrementId, firstNodeId);
+            var wayCounter = new IdCounter (incrementId, firstWayId);
 
-            OutputSettings settings = new OutputSettings ();
+            var settings = new OutputSettings ();
             settings.ContourMarker = contourMarker;
             settings.LongitudeCorrection = corrX;
             settings.LatitudeCorrection = corrY;
@@ -137,9 +150,9 @@ namespace Srtm2Osm
                 Bounds2 corrBounds = new Bounds2 (bound.MinX - corrX, bound.MinY - corrY,
                     bound.MaxX - corrX, bound.MaxY - corrY);
 
-                activityLogger.LogFormat (ActivityLogLevel.Normal, "Calculating contour data for bound {0}...", corrBounds);
+                activityLogger.LogFormat (ActivityLogLevel.Normal, "Calculating contour data for bound {0} ...", corrBounds);
 
-                IRasterDigitalElevationModel dem = (IRasterDigitalElevationModel) storage.LoadDemForArea (corrBounds);
+                var dem = (IRasterDigitalElevationModel) storage.LoadDemForArea (corrBounds);
 
                 // clear up some memory used in storage object
                 if (this.bounds.Count == 1)
@@ -150,13 +163,13 @@ namespace Srtm2Osm
 
                 DigitalElevationModelStatistics statistics = dem.CalculateStatistics ();
 
-                activityLogger.Log (ActivityLogLevel.Normal, String.Format (CultureInfo.InvariantCulture,
+                activityLogger.Log (ActivityLogLevel.Normal, string.Format (CultureInfo.InvariantCulture,
                     "DEM data points count: {0}", dem.DataPointsCount));
-                activityLogger.Log (ActivityLogLevel.Normal, String.Format (CultureInfo.InvariantCulture,
+                activityLogger.Log (ActivityLogLevel.Normal, string.Format (CultureInfo.InvariantCulture,
                     "DEM minimum elevation: {0}", statistics.MinElevation));
-                activityLogger.Log (ActivityLogLevel.Normal, String.Format (CultureInfo.InvariantCulture,
+                activityLogger.Log (ActivityLogLevel.Normal, string.Format (CultureInfo.InvariantCulture,
                     "DEM maximum elevation: {0}", statistics.MaxElevation));
-                activityLogger.Log (ActivityLogLevel.Normal, String.Format (CultureInfo.InvariantCulture,
+                activityLogger.Log (ActivityLogLevel.Normal, string.Format (CultureInfo.InvariantCulture,
                     "DEM has missing points: {0}", statistics.HasMissingPoints));
 
                 try
@@ -183,7 +196,7 @@ namespace Srtm2Osm
                     activityLogger.Log(ActivityLogLevel.Warning, "No contour line found. Try to increase the overall area.");
             }
 
-            if (!largeAreaMode)
+            if (output.HasData && !largeAreaMode)
                 activityLogger.Log (ActivityLogLevel.Normal, "Saving contour data to file...");
 
             output.End ();
@@ -209,8 +222,10 @@ namespace Srtm2Osm
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.Feet, "feet", 0));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.LargeAreaMode, "large", 0));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.CorrectionXY, "corrxy", 2));
-            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSource, "source", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SetMinElevation, "first", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSource, "source", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceFlat, "sourceflat", 1));
+            options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SrtmSourceExtension, "sourceextension", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.MaxWayNodes, "maxwaynodes", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstNodeId, "firstnodeid", 1));
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.FirstWayId, "firstwayid", 1));
@@ -218,157 +233,40 @@ namespace Srtm2Osm
             options.AddOption (new ConsoleApplicationOption ((int)Srtm2OsmCommandOption.SplitBounds, "splitbounds", 2));
 
             startFrom = options.ParseArgs (args, startFrom);
-            CultureInfo invariantCulture = CultureInfo.InvariantCulture;
 
-            foreach (ConsoleApplicationOption option in options.UsedOptions)
+            foreach (var option in options.UsedOptions)
             {
                 switch ((Srtm2OsmCommandOption)option.OptionId)
                 {
                     case Srtm2OsmCommandOption.CorrectionXY:
-                        {
-                            corrX = Double.Parse (option.Parameters[0], invariantCulture);
-                            corrY = Double.Parse (option.Parameters[1], invariantCulture);
-                            continue;
-                        }
+                        corrX = double.Parse(option.Parameters[0], CultureInfo.InvariantCulture);
+                        corrY = double.Parse(option.Parameters[1], CultureInfo.InvariantCulture);
+                        continue;
 
                     case Srtm2OsmCommandOption.SrtmSource:
-                        {
-                            Uri uri;
+                        SetSource(option.Parameters[0]);
+                        continue;
 
-                            try
-                            {
-                                string url = option.Parameters[0];
+                    case Srtm2OsmCommandOption.SrtmSourceFlat:
+                        srtmSourceFlat = true;
+                        SetSource(option.Parameters[0]);
+                        continue;
 
-                                // The URI has to end with a slash
-                                if (!url.EndsWith("/", StringComparison.Ordinal))
-                                    url += "/";
-
-                                uri = new Uri (url);
-                            }
-                            catch (UriFormatException)
-                            {
-                                throw new ArgumentException ("The source URL is not valid.");
-                            }
-
-                            // Check if the prefix is supported. Unfortunately I couldn't find a method to check which
-                            // prefixes are registered without calling WebRequest.Create(), which I didn't want here.
-                            if (uri.Scheme != "http" && uri.Scheme != "https" && uri.Scheme != "ftp" && uri.Scheme != "file")
-                            {
-                                string error = String.Format(invariantCulture, "The source's scheme ('{0}') is not supported.", uri.Scheme);
-                                throw new ArgumentException (error);
-                            }
-
-                            srtmSource = uri;
-
-                            continue;
-                        }
+                    case Srtm2OsmCommandOption.SrtmSourceExtension:
+                        srtmSourceExtension = option.Parameters[0];
+                        continue;
 
                     case Srtm2OsmCommandOption.Bounds1:
-                        {
-                            double minLat = Double.Parse (option.Parameters[0], invariantCulture);
-                            double minLng = Double.Parse (option.Parameters[1], invariantCulture);
-                            double maxLat = Double.Parse (option.Parameters[2], invariantCulture);
-                            double maxLng = Double.Parse (option.Parameters[3], invariantCulture);
-
-                            if (minLat == maxLat)
-                                throw new ArgumentException ("Minimum and maximum latitude may not have the same value.");
-
-                            if (minLng == maxLng)
-                                throw new ArgumentException ("Minimum and maximum longitude may not have the same value.");
-
-                            if (minLat > maxLat)
-                            {
-                                double sw = minLat;
-                                minLat = maxLat;
-                                maxLat = sw;
-                            }
-
-                            if (minLng > maxLng)
-                            {
-                                double sw = minLng;
-                                minLng = maxLng;
-                                maxLng = sw;
-                            }
-
-                            EnsureValidCoords (minLat, maxLat, minLng, maxLng);
-
-                            this.bounds.Add (new Bounds2 (minLng, minLat, maxLng, maxLat));
-                            continue;
-                        }
+                        SetBounds1 (option.Parameters[0], option.Parameters[1], option.Parameters[2], option.Parameters[3]);
+                        continue;
 
                     case Srtm2OsmCommandOption.Bounds2:
-                        {
-                            double lat = Double.Parse (option.Parameters[0], invariantCulture);
-                            double lng = Double.Parse (option.Parameters[1], invariantCulture);
-                            double boxSizeInKilometers = Double.Parse (option.Parameters[2], invariantCulture);
-
-                            this.bounds.Add (CalculateBounds (lat, lng, boxSizeInKilometers));
-                            continue;
-                        }
+                        SetBounds2 (option.Parameters[0], option.Parameters[1], option.Parameters[2]);
+                        continue;
 
                     case Srtm2OsmCommandOption.Bounds3:
-                        {
-                            Uri slippyMapUrl = new Uri (option.Parameters[0]);
-                            double lat = 0;
-                            double lng = 0;
-                            int zoomLevel = 0;
-
-                            if (slippyMapUrl.Fragment != String.Empty)
-                            {
-                                // map=18/50.07499/10.21574
-                                string pattern = @"map=(\d+)/([-\.\d]+)/([-\.\d]+)";
-                                Match match = Regex.Match(slippyMapUrl.Fragment, pattern);
-
-                                if (match.Success)
-                                {
-                                    try
-                                    {
-                                        zoomLevel = Int32.Parse(match.Groups[1].Value, invariantCulture); 
-                                        lat = Double.Parse(match.Groups[2].Value, invariantCulture);
-                                        lng = Double.Parse(match.Groups[3].Value, invariantCulture);
-                                    }
-                                    catch (FormatException fex)
-                                    {
-                                        throw new ArgumentException("Invalid slippymap URL.", fex);
-                                    }
-
-                                    this.bounds.Add (CalculateBounds (lat, lng, zoomLevel));
-                                }
-                                else
-                                    throw new ArgumentException("Invalid slippymap URL.");
-                            }
-                            else if (slippyMapUrl.Query != String.Empty)
-                            {
-                                string queryPart = slippyMapUrl.Query;
-                                NameValueCollection queryParameters = HttpUtility.ParseQueryString(queryPart);
-
-                                if (queryParameters["lat"] != null
-                                    && queryParameters["lon"] != null
-                                    && queryParameters["zoom"] != null)
-                                {
-                                    try
-                                    {
-                                        lat = Double.Parse(queryParameters["lat"], invariantCulture);
-                                        lng = Double.Parse(queryParameters["lon"], invariantCulture);
-                                        zoomLevel = Int32.Parse(queryParameters["zoom"], invariantCulture);
-                                    }
-                                    catch (FormatException fex)
-                                    {
-                                        throw new ArgumentException("Invalid slippymap URL.", fex);
-                                    }
-
-                                    this.bounds.Add (CalculateBounds (lat, lng, zoomLevel));
-                                }
-                                else if (queryParameters["bbox"] != null)
-                                    this.bounds.Add (CalculateBounds (queryParameters["bbox"]));
-                                else
-                                    throw new ArgumentException("Invalid slippymap URL.");
-                            }
-                            else
-                                throw new ArgumentException("Invalid slippymap URL.");
-
-                            continue;
-                        }
+                        SetBounds3 (option.Parameters[0], option.Parameters[1], option.Parameters[2], option.Parameters[3]);
+                        continue;
 
                     case Srtm2OsmCommandOption.OutputFile:
                         outputOsmFile = option.Parameters [0];
@@ -387,23 +285,18 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.ElevationStep:
-                        elevationStep = int.Parse (option.Parameters [0], invariantCulture);
+                        elevationStep = int.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
 
                         if (elevationStep <= 0)
                             throw new ArgumentException ("Elevation step must be a positive integer value.");
 
                         continue;
 
-                    case Srtm2OsmCommandOption.SetMinElevation:
-                        setMinElevation = double.Parse(option.Parameters[0], CultureInfo.InvariantCulture);
-                        continue;
-
                     case Srtm2OsmCommandOption.Categories:
-                        majorFactor = double.Parse (option.Parameters[0], invariantCulture);
-                        mediumFactor = double.Parse (option.Parameters[1], invariantCulture);
+                        majorFactor = double.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
+                        mediumFactor = double.Parse (option.Parameters[1], CultureInfo.InvariantCulture);
 
                         contourMarker = new MkgmapContourMarker (majorFactor, mediumFactor);
-
                         continue;
 
                     case Srtm2OsmCommandOption.Feet:
@@ -415,7 +308,7 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.MaxWayNodes:
-                        maxWayNodes = Int32.Parse (option.Parameters[0], invariantCulture);
+                        maxWayNodes = short.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
 
                         if (maxWayNodes < 2)
                             throw new ArgumentException ("The minimum number of nodes in a single way is 2.");
@@ -423,7 +316,7 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.FirstNodeId:
-                        firstNodeId = long.Parse(option.Parameters[0], invariantCulture);
+                        firstNodeId = long.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
 
                         if (firstNodeId <= 0)
                             throw new ArgumentException ("A negative or zero node ID is not supported.");
@@ -431,7 +324,7 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.FirstWayId:
-                        firstWayId = long.Parse(option.Parameters[0], invariantCulture);
+                        firstWayId = long.Parse (option.Parameters[0], CultureInfo.InvariantCulture);
 
                         if (firstWayId <= 0)
                             throw new ArgumentException ("A negative or zero way ID is not supported.");
@@ -443,8 +336,8 @@ namespace Srtm2Osm
                         continue;
 
                     case Srtm2OsmCommandOption.SplitBounds:
-                        splitHeight = Double.Parse (option.Parameters[0], invariantCulture);
-                        splitWidth = Double.Parse (option.Parameters[1], invariantCulture);
+                        splitHeight = double.Parse(option.Parameters[0], CultureInfo.InvariantCulture);
+                        splitWidth = double.Parse(option.Parameters[1], CultureInfo.InvariantCulture);
 
                         if (splitWidth <= 0 || splitHeight <= 0)
                             throw new ArgumentException ("The split width or height may not be smaller than zero.");
@@ -455,10 +348,16 @@ namespace Srtm2Osm
 
             // Check if bounds were specified
             if (bounds.Count == 0 && osmMergeFile != null)
-                this.bounds = RetrieveBoundsFromFile (osmMergeFile);
+                bounds = RetrieveBoundsFromFile (osmMergeFile);
 
             if (bounds.Count == 0)
-                throw new ArgumentException ("No bounds specified.");
+            {
+                // Allow recreation of index without definition of bounds
+                if (!generateIndex)
+                {
+                    throw new ArgumentException ("No bounds specified.");
+                }
+            }
 
             // Check if both first*id's are set when the user wants to increment the IDs
             if (incrementId && (firstNodeId == long.MaxValue || firstWayId == long.MaxValue))
@@ -467,16 +366,152 @@ namespace Srtm2Osm
             return startFrom;
         }
 
+        private void SetSource(string url)
+        {
+            Uri uri;
+
+            try
+            {
+                // The URI has to end with a slash
+                if (!url.EndsWith("/", StringComparison.Ordinal))
+                    url += "/";
+
+                uri = new Uri(url);
+            }
+            catch (UriFormatException)
+            {
+                throw new ArgumentException ("The source URL is not valid.");
+            }
+
+            // Check if the prefix is supported. Unfortunately I couldn't find a method to check which
+            // prefixes are registered without calling WebRequest.Create(), which I didn't want here.
+            if (uri.Scheme != "http" && uri.Scheme != "https" && uri.Scheme != "ftp" && uri.Scheme != "file")
+            {
+                string error = string.Format (CultureInfo.InvariantCulture, "The source's scheme ('{0}') is not supported.", uri.Scheme);
+                throw new ArgumentException(error);
+            }
+
+            srtmSource = uri;
+        }
+
+        private void SetBounds1 (string minLatParam, string minLngParam, string maxLatParam, string maxLngParam)
+        {
+            double minLat = double.Parse (minLatParam, CultureInfo.InvariantCulture);
+            double minLng = double.Parse (minLngParam, CultureInfo.InvariantCulture);
+            double maxLat = double.Parse (maxLatParam, CultureInfo.InvariantCulture);
+            double maxLng = double.Parse (maxLngParam, CultureInfo.InvariantCulture);
+
+            if (minLat == maxLat)
+                throw new ArgumentException ("Minimum and maximum latitude may not have the same value.");
+
+            if (minLng == maxLng)
+                throw new ArgumentException ("Minimum and maximum longitude may not have the same value.");
+
+            if (minLat > maxLat)
+            {
+                var sw = minLat;
+                minLat = maxLat;
+                maxLat = sw;
+            }
+
+            if (minLng > maxLng)
+            {
+                var sw = minLng;
+                minLng = maxLng;
+                maxLng = sw;
+            }
+
+            EnsureValidCoords (minLat, maxLat, minLng, maxLng);
+
+            bounds.Add (new Bounds2(minLng, minLat, maxLng, maxLat));
+        }
+
+        private void SetBounds2 (string latParam, string lngParam, string boxSize)
+        {
+            var lat = double.Parse (latParam, CultureInfo.InvariantCulture);
+            var lng = double.Parse (lngParam, CultureInfo.InvariantCulture);
+            var boxSizeInKilometers = double.Parse(boxSize, CultureInfo.InvariantCulture);
+
+            bounds.Add (CalculateBounds(lat, lng, boxSizeInKilometers));
+        }
+
+        private void SetBounds3 (string url, string zoomLevelParam, string latParam, string lngParam)
+        {
+            Uri slippyMapUrl = new Uri(url);
+            int zoomLevel;
+            double lat;
+            double lng;
+            if (!string.IsNullOrEmpty(slippyMapUrl.Fragment))
+            {
+                // map=18/50.07499/10.21574
+                var pattern = @"map=(\d+)/([-\.\d]+)/([-\.\d]+)";
+                Match match = Regex.Match (slippyMapUrl.Fragment, pattern);
+
+                if (match.Success)
+                {
+                    try
+                    {
+                        zoomLevel = short.Parse (zoomLevelParam, CultureInfo.InvariantCulture);
+                        lat = double.Parse (latParam, CultureInfo.InvariantCulture);
+                        lng = short.Parse (lngParam, CultureInfo.InvariantCulture);
+                    }
+                    catch (FormatException fex)
+                    {
+                        throw new ArgumentException ("Invalid slippymap URL.", fex);
+                    }
+
+                    bounds.Add (CalculateBounds(lat, lng, zoomLevel));
+                }
+                else
+                {
+                    throw new ArgumentException ("Invalid slippymap URL.");
+                }
+            }
+            else if (!string.IsNullOrEmpty(slippyMapUrl.Query))
+            {
+                var queryPart = slippyMapUrl.Query;
+                var queryParameters = HttpUtility.ParseQueryString (queryPart);
+
+                if (queryParameters["lat"] != null && queryParameters["lon"] != null && queryParameters["zoom"] != null)
+                {
+                    try
+                    {
+                        lat = double.Parse (queryParameters["lat"], CultureInfo.InvariantCulture);
+                        lng = double.Parse (queryParameters["lon"], CultureInfo.InvariantCulture);
+                        zoomLevel = short.Parse (queryParameters["zoom"], CultureInfo.InvariantCulture);
+                    }
+                    catch (FormatException fex)
+                    {
+                        throw new ArgumentException("Invalid slippymap URL.", fex);
+                    }
+
+                    bounds.Add (CalculateBounds(lat, lng, zoomLevel));
+                }
+                else if (queryParameters["bbox"] != null)
+                {
+                    bounds.Add (CalculateBounds(queryParameters["bbox"]));
+                }
+                else
+                {
+                    throw new ArgumentException("Invalid slippymap URL.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Invalid slippymap URL.");
+            }
+        }
+
         #endregion
 
-        static private List<Bounds2> RetrieveBoundsFromFile(string file)
+        static private List<Bounds2> RetrieveBoundsFromFile (string file)
         {
             if (!File.Exists (file))
                 throw new FileNotFoundException ("File not found.", file);
 
-            List<Bounds2> result = new List<Bounds2> ();
+            var result = new List<Bounds2> ();
 
-            XmlReader reader = XmlReader.Create (file);
+            var reader = XmlReader.Create (file);
             while(reader.ReadToFollowing ("bounds"))
             {
                 string minlat = reader.GetAttribute ("minlat");
@@ -484,7 +519,7 @@ namespace Srtm2Osm
                 string maxlat = reader.GetAttribute ("maxlat");
                 string maxlon = reader.GetAttribute ("maxlon");
 
-                Bounds2 bound = new Bounds2 ();
+                var bound = new Bounds2 ();
 
                 try
                 {
@@ -542,10 +577,10 @@ namespace Srtm2Osm
 
         static private Bounds2 CalculateBounds (string bbox)
         {
-            if (String.IsNullOrEmpty(bbox))
+            if (string.IsNullOrEmpty(bbox))
                 throw new ArgumentException ("String is NULL or empty.", "bbox");
 
-            string[] parts = bbox.Split (new char[] { ',' });
+            var parts = bbox.Split (new char[] { ',' });
 
             if (parts.Length != 4)
                 throw new ArgumentException ("Bounding box has not exactly four parts.", "bbox");
@@ -554,10 +589,10 @@ namespace Srtm2Osm
 
             try
             {
-                minLng = Double.Parse (parts[0], CultureInfo.InvariantCulture);
-                minLat = Double.Parse (parts[1], CultureInfo.InvariantCulture);
-                maxLng = Double.Parse (parts[2], CultureInfo.InvariantCulture);
-                maxLat = Double.Parse (parts[3], CultureInfo.InvariantCulture);
+                minLng = double.Parse (parts[0], CultureInfo.InvariantCulture);
+                minLat = double.Parse (parts[1], CultureInfo.InvariantCulture);
+                maxLng = double.Parse (parts[2], CultureInfo.InvariantCulture);
+                maxLat = double.Parse (parts[3], CultureInfo.InvariantCulture);
             }
             catch (FormatException fex)
             {
@@ -571,12 +606,12 @@ namespace Srtm2Osm
 
         private long GetNextId (IdCounter counter, bool isNodeCounter)
         {
-            bool valid = false;
+            var valid = false;
             long result = counter.GetNextId (out valid);
 
             if (!valid)
             {
-                string msg = String.Format (CultureInfo.InvariantCulture,
+                var msg = string.Format (CultureInfo.InvariantCulture,
                     "Ran out of available ID numbers. {0}crement 'first{1}id' parameter.",
                     incrementId ? "De" : "In", isNodeCounter ? "node" : "way");
                 throw new ArgumentException (msg);
@@ -605,7 +640,9 @@ namespace Srtm2Osm
         private double majorFactor, mediumFactor;
         private IContourMarker contourMarker = new DefaultContourMarker();
         private bool largeAreaMode;
-        private Uri srtmSource;
+        private Uri srtmSource = new Uri("http://firmware.ardupilot.org/SRTM/");
+        private bool srtmSourceFlat;
+        private string srtmSourceExtension = ".hgt.zip";
         private double ? setMinElevation = null;
         private int maxWayNodes = 5000;
         private long firstNodeId = long.MaxValue - 10;

@@ -3,6 +3,17 @@ Srtm2Osm tool by Igor Brejc and others
 VERSION HISTORY
 ---------------
 
+1.xx
+----
+- Add option to support unstructured sources (-sourceflat)
+- Add option to use specific source file extension (-sourceextension, default: .hgt.zip)
+- Redesign index file to support flat sources and avoid serialization of SrtmIndex class
+  (insecure BinaryFormatter will break update to .net 8)
+- Suppress error for index recreation with parameter -i without bounds specified
+- Cleanup Code of Srtm2OsmCommand
+  - extract methods to set source and bounds
+  - adjust data types (Double => double, Int16 => short)
+
 1.16
 ----
 - Changed defaults for node & way IDs, because downstream software uses the old defaults for state handling.
