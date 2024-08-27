@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Brejc.DemLibrary
 {
-    // NOTE: names correspond to actual directory names on the srtm ftp server!
-    public enum SrtmContinentalRegion
+    [SuppressMessage("Microsoft.Design", "CA1028:EnumStorageShouldBeInt32")]
+    public enum SrtmContinentalRegion : byte
     {
         None,
         Australia,
@@ -20,27 +19,51 @@ namespace Brejc.DemLibrary
         North_America,
         [SuppressMessage ("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
         South_America,
-        End,
+        Flat
     }
 
-    [Serializable]
     public class SrtmIndex
     {
-        public IActivityLogger ActivityLogger { get { return activityLogger; } set { activityLogger = value; } }
+        // NOTE: names matching directory names on the srtm server http://firmware.ardupilot.org/SRTM/
+        // other directory structure is not supported, but we support unstructured (flat) sources
+        // with SrtmContinentalRegion.Flat.
+        private static readonly List<SrtmContinentalRegion> StructuredRegions = new List<SrtmContinentalRegion> {
+            SrtmContinentalRegion.Australia,
+            SrtmContinentalRegion.Eurasia,
+            SrtmContinentalRegion.Africa,
+            SrtmContinentalRegion.Islands,
+            SrtmContinentalRegion.North_America,
+            SrtmContinentalRegion.South_America
+        };
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
+        public IActivityLogger ActivityLogger { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
         public SrtmContinentalRegion GetValueForCell (int longitude, int latitude)
         {
-            return (SrtmContinentalRegion)data[longitude + 180 + 360 * (latitude + 90)];
+            var index = longitude + 180 + 360 * (latitude + 90);
+            if (index >= 0 && index < data.Length)
+            {
+                return (SrtmContinentalRegion)data[index];
+            }
+            return SrtmContinentalRegion.None;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "latitude+90")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2233:OperationsShouldNotOverflow", MessageId = "longitude+180")]
         public void SetValueForCell (int longitude, int latitude, SrtmContinentalRegion continentalRegion)
         {
-            data[longitude + 180 + 360 * (latitude + 90)] = (int)continentalRegion;
+            var index = longitude + 180 + 360 * (latitude + 90);
+            if (index >= 0 && index < data.Length)
+            {
+                data[longitude + 180 + 360 * (latitude + 90)] = (byte)continentalRegion;
+            }
         }
+
+        private static Uri srtmSource = new Uri("http://firmware.ardupilot.org/SRTM/");
+        public static bool SrtmSourceFlat { get; set; }
+        private static string srtmSourceExtension = ".hgt.zip";
 
         public static Uri SrtmSource
         {
@@ -52,38 +75,57 @@ namespace Brejc.DemLibrary
             }
         }
 
-        private static Uri srtmSource = new Uri ("http://firmware.ardupilot.org/SRTM/");
+        public static string SrtmSourceExtension
+        {
+            get { return srtmSourceExtension; }
+            set { srtmSourceExtension = value; }
+        }
 
-        // Example file: "N00E006.hgt.zip"
-        private static Regex remoteFileNameRegex = new Regex("href=\"([A-Za-z0-9]*\\.hgt\\.zip)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        private static Regex localFileNameRegex = new Regex("([A-Za-z0-9]*\\.hgt\\.zip)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
-        /// Generates an index file by listing all available SRTM cells on the FTP site.
+        /// Generates an index file by listing all available SRTM cells in the source (on the FTP site/in the local folder).
         /// </summary>
         public void Generate ()
         {
-            activityLogger.Log(ActivityLogLevel.Verbose, "Downloading data for SRTM index generation");
+            ActivityLogger.Log(ActivityLogLevel.Verbose, "Downloading data for SRTM index generation");
 
-            bool isLocal = srtmSource.Scheme == "file";
-
-            for (SrtmContinentalRegion continentalRegion = (SrtmContinentalRegion.None + 1); 
-                 continentalRegion < SrtmContinentalRegion.End;
-                 continentalRegion++)
+            if (SrtmSourceFlat)
             {
-                string region = continentalRegion.ToString();
-                Uri uri = new Uri (srtmSource, region + "/");
+                GenerateRegion(SrtmContinentalRegion.Flat);
+            }
+            else
+            {
+                foreach (var region in StructuredRegions)
+                {
+                    GenerateRegion(region);
+                }
+            }
+        }
 
-                if (isLocal)
-                    GenerateFromLocal (uri, continentalRegion);
-                else
-                    GenerateFromRemote (uri, continentalRegion);
+        private void GenerateRegion (SrtmContinentalRegion region)
+        {
+            var uri = (region == SrtmContinentalRegion.Flat) ? SrtmSource : new Uri(SrtmSource, region + "/");
+            bool isLocal = SrtmSource.Scheme == "file";
+            if (isLocal)
+            {
+                GenerateFromLocal(uri, region);
+            }
+            else
+            {
+                GenerateFromRemote(uri, region);
             }
         }
 
         private void GenerateFromLocal (Uri uri, SrtmContinentalRegion continentalRegion)
         {
-            string[] files = Directory.GetFiles (uri.AbsolutePath, "*.zip");
+            // Example: "N00E006.hgt.zip" but extension may be overwritten by SrtmSourceExtension.
+            // we have to escape the dots for use in regex
+            var extension = SrtmSourceExtension.Replace(".", @"\.");
+            var localFileNameRegex = new Regex(@"([NnSs]\d\d[WwEe]\d\d\d" + extension + ")", RegexOptions.IgnoreCase);
+
+            var localFiles = 0;
+            var searchPattern = "*" + SrtmSourceExtension;
+            var files = Directory.GetFiles (uri.AbsolutePath, searchPattern);
             foreach (string file in files)
             {
                 Match match = localFileNameRegex.Match (file);
@@ -91,17 +133,25 @@ namespace Brejc.DemLibrary
                     continue;
                 
                 CreateCell(Path.GetFileName (file), continentalRegion);
+                localFiles++;
             }
+            ActivityLogger.LogFormat(ActivityLogLevel.Verbose, "- added {0} files to index from local (region {1})", localFiles, continentalRegion);
         }
 
         private void GenerateFromRemote (Uri uri, SrtmContinentalRegion continentalRegion)
         {
+            // Example: "N00E006.hgt.zip" but extension may be overwritten by SrtmSourceExtension.
+            // we have to escape the dots for use in regex
+            var extension = SrtmSourceExtension.Replace(".", @"\.");
+            var remoteFileNameRegex = new Regex("href=\"([A-Za-z0-9]*" + extension + ")\"", RegexOptions.IgnoreCase);
+            var remoteFiles = 0;
+
             // Get the directory listing from the server
             WebClient webClient = new WebClient ();
             string responseFromServer = webClient.DownloadString (uri);
 
             // Find files and process each match.
-            MatchCollection matches = remoteFileNameRegex.Matches (responseFromServer);
+            var matches = remoteFileNameRegex.Matches (responseFromServer);
             foreach (Match match in matches)
             {
                 string filename = match.Groups[1].Value.Trim();
@@ -109,7 +159,9 @@ namespace Brejc.DemLibrary
                     continue;
 
                 CreateCell (filename, continentalRegion);
+                remoteFiles++;
             }
+            ActivityLogger.LogFormat(ActivityLogLevel.Verbose, "- added {0} files to index from remote (region {1})", remoteFiles, continentalRegion);
         }
 
         private void CreateCell(string filename, SrtmContinentalRegion continentalRegion)
@@ -124,34 +176,29 @@ namespace Brejc.DemLibrary
         /// <param name="filePath">The file path.</param>
         public void Save (string filePath)
         {
-            using (FileStream file = File.Open (filePath, FileMode.Create, FileAccess.Write))
-            {
-                BinaryFormatter formatter = new BinaryFormatter ();
-                formatter.Serialize (file, this);
-            }
+            File.WriteAllBytes(filePath, data);
         }
 
         /// <summary>
         /// Loads a SRTM index from a specified file.
+        /// Check length to avoid the use of older incompatible files.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <returns></returns>
-        static public SrtmIndex Load (string filePath)
+        public bool Load (string filePath)
         {
-            SrtmIndex index;
-
-            using (FileStream file = File.Open (filePath, FileMode.Open, FileAccess.Read))
+            var bytes = File.ReadAllBytes (filePath);
+            if (bytes.Length == data.Length)
             {
-                BinaryFormatter formatter = new BinaryFormatter ();
-                index = formatter.Deserialize (file) as SrtmIndex;
+                data = bytes;
+                return true;
             }
-
-            return index;
+            return false;
         }
 
-        private int[] data = new int[360*180];
-
-        [NonSerialized()]
-        private IActivityLogger activityLogger;
+        /// data of the index file = 360x180x4 Bytes = 64'800 bytes
+        /// (former implementation used 259'200 integer values)
+        /// the array is accessed by <see cref="GetValueForCell"/> and <see cref="SetValueForCell"/> 
+        private byte[] data = new byte[360*180];
     }
 }
